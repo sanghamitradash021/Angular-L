@@ -1,0 +1,37 @@
+{
+  "name": "angular-l",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanghamitradash021/Angular-L.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sanghamitradash021/Angular-L/issues"
+  },
+  "homepage": "https://github.com/sanghamitradash021/Angular-L#readme",
+  "description": "",
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.8.1",
+    "commitlint": "^19.8.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6"
+  },
+  "lint-staged": {
+    "recipe-app/**/*.{ts,html,css}": [
+      "npm --prefix recipe-app run format",
+      "npm --prefix recipe-app run lint"
+    ],
+    "server/**/*.ts": [
+      "npm --prefix server run format",
+      "npm --prefix server run lint"
+    ]
+  }
+}

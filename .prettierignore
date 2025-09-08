@@ -1,0 +1,6 @@
+/node_modules
+/dist
+/recipe-app/node_modules
+/recipe-app/dist
+/server/node_modules
+/server/dist

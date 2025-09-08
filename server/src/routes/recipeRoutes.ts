@@ -40,7 +40,6 @@
 
 // export default router;
 
-
 // import express from "express";
 // import recipeController, { createRecipe, upload } from "../controllers/recipeController";
 
@@ -262,10 +261,9 @@
 
 // export default router;
 
-
 // recipeRoutes.ts
-import express from "express";
-import recipeController from "../controllers/recipeController"; // Default import
+import express from 'express';
+import recipeController from '../controllers/recipeController'; // Default import
 
 const router = express.Router();
 
@@ -347,7 +345,7 @@ router.post('/create', recipeController.createRecipe);
  *       200:
  *         description: List of recipes
  */
-router.get("/getall", recipeController.getAllRecipes);
+router.get('/getall', recipeController.getAllRecipes);
 
 /**
  * @swagger
@@ -366,7 +364,7 @@ router.get("/getall", recipeController.getAllRecipes);
  *       404:
  *         description: Recipe not found
  */
-router.get("/:id", recipeController.getRecipeById);
+router.get('/:id', recipeController.getRecipeById);
 
 /**
  * @swagger
@@ -383,7 +381,7 @@ router.get("/:id", recipeController.getRecipeById);
  *       200:
  *         description: List of matching recipes
  */
-router.get("/search/:query", recipeController.searchRecipes);
+router.get('/search/:query', recipeController.searchRecipes);
 
 /**
  * @swagger
@@ -412,7 +410,7 @@ router.get("/search/:query", recipeController.searchRecipes);
  *       403:
  *         description: Unauthorized
  */
-router.put("/:id", recipeController.updateRecipe);
+router.put('/:id', recipeController.updateRecipe);
 
 /**
  * @swagger
@@ -431,7 +429,7 @@ router.put("/:id", recipeController.updateRecipe);
  *       403:
  *         description: Unauthorized
  */
-router.delete("/:id", recipeController.deleteRecipe);
+router.delete('/:id', recipeController.deleteRecipe);
 
 /**
  * @swagger
@@ -448,7 +446,7 @@ router.delete("/:id", recipeController.deleteRecipe);
  *       200:
  *         description: List of recipes
  */
-router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+router.get('/cuisine/:cuisine', recipeController.getRecipesByCuisine);
 
 /**
  * @swagger
@@ -465,7 +463,7 @@ router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
  *       200:
  *         description: List of recipes
  */
-router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+router.get('/mealtype/:mealType', recipeController.getRecipesByMealType);
 
 /**
  * @swagger
@@ -482,6 +480,6 @@ router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
  *       200:
  *         description: List of user recipes
  */
-router.get("/my-recipes/:userId", recipeController.getUserRecipes);
+router.get('/my-recipes/:userId', recipeController.getUserRecipes);
 
 export default router;

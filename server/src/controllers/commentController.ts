@@ -8,7 +8,7 @@
 //         const { recipeId } = req.params;
 
 //         const [newComment] = await sequelize.query(
-//             `INSERT INTO Comments (recipe_id, user_id, content, createdAt, updatedAt) 
+//             `INSERT INTO Comments (recipe_id, user_id, content, createdAt, updatedAt)
 //                 VALUES (:recipeId, :userId, :content, NOW(), NOW())`,
 //             {
 //                 replacements: {
@@ -28,8 +28,6 @@
 //         res.status(500).json({ message: "Error adding comment", error: error.message });
 //     }
 // };
-
-
 
 // const getComments = async (req: Request, res: Response): Promise<void> => {
 //     try {
@@ -122,84 +120,83 @@
 //     deleteComment,
 // };
 
-
-import { Request, Response } from "express";
-import CommentRepository from "../repositories/commentRepository";
+import { Request, Response } from 'express';
+import CommentRepository from '../repositories/commentRepository';
 
 const addComment = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { userId, content } = req.body;
-        const { recipeId } = req.params;
+  try {
+    const { userId, content } = req.body;
+    const { recipeId } = req.params;
 
-        // Add the comment using the repository and get the new comment
-        const newComment = await CommentRepository.addComment(Number(recipeId), userId, content);
+    // Add the comment using the repository and get the new comment
+    const newComment = await CommentRepository.addComment(Number(recipeId), userId, content);
 
-        res.status(201).json(newComment);
-    } catch (error: any) {
-        console.error("Error adding comment:", error);
-        res.status(500).json({ message: "Error adding comment", error: error.message });
-    }
+    res.status(201).json(newComment);
+  } catch (error: any) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Error adding comment', error: error.message });
+  }
 };
 
 const getComments = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { recipeId } = req.params;
+  try {
+    const { recipeId } = req.params;
 
-        // Get the comments from the repository
-        const comments = await CommentRepository.getCommentsByRecipe(Number(recipeId));
+    // Get the comments from the repository
+    const comments = await CommentRepository.getCommentsByRecipe(Number(recipeId));
 
-        res.status(200).json(comments);
-    } catch (error: any) {
-        console.error("Error fetching comments:", error);
-        res.status(500).json({ message: "Error fetching comments", error: error.message });
-    }
+    res.status(200).json(comments);
+  } catch (error: any) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ message: 'Error fetching comments', error: error.message });
+  }
 };
 
 const updateComment = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { commentId, userId, content } = req.body;
+  try {
+    const { commentId, userId, content } = req.body;
 
-        // Check if the comment exists and belongs to the user
-        const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+    // Check if the comment exists and belongs to the user
+    const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
 
-        if (!existingComment) {
-            res.status(404).json({ message: "Comment not found or unauthorized" });
-            return;
-        }
-
-        // Update the comment using the repository
-        await CommentRepository.updateComment(commentId, content);
-
-        res.status(200).json({ message: "Comment updated successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Error updating comment", error });
+    if (!existingComment) {
+      res.status(404).json({ message: 'Comment not found or unauthorized' });
+      return;
     }
+
+    // Update the comment using the repository
+    await CommentRepository.updateComment(commentId, content);
+
+    res.status(200).json({ message: 'Comment updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating comment', error });
+  }
 };
 
 const deleteComment = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { commentId, userId } = req.body;
+  try {
+    const { commentId, userId } = req.body;
 
-        // Check if the comment exists and belongs to the user
-        const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+    // Check if the comment exists and belongs to the user
+    const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
 
-        if (!existingComment) {
-            res.status(404).json({ message: "Comment not found or unauthorized" });
-            return;
-        }
-
-        // Delete the comment using the repository
-        await CommentRepository.deleteComment(commentId);
-
-        res.status(200).json({ message: "Comment deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Error deleting comment", error });
+    if (!existingComment) {
+      res.status(404).json({ message: 'Comment not found or unauthorized' });
+      return;
     }
+
+    // Delete the comment using the repository
+    await CommentRepository.deleteComment(commentId);
+
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting comment', error });
+  }
 };
 
 export default {
-    addComment,
-    getComments,
-    updateComment,
-    deleteComment,
+  addComment,
+  getComments,
+  updateComment,
+  deleteComment,
 };

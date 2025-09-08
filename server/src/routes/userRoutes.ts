@@ -1,5 +1,5 @@
-import express from "express";
-import userController from "../controllers/userController";
+import express from 'express';
+import userController from '../controllers/userController';
 
 const router = express.Router();
 
@@ -32,7 +32,7 @@ const router = express.Router();
  *       400:
  *         description: User already exists
  */
-router.post("/register", userController.register);
+router.post('/register', userController.register);
 
 /**
  * @swagger
@@ -57,7 +57,7 @@ router.post("/register", userController.register);
  *       400:
  *         description: Invalid credentials
  */
-router.post("/login", userController.login);
+router.post('/login', userController.login);
 
 /**
  * @swagger
@@ -77,7 +77,7 @@ router.post("/login", userController.login);
  *       404:
  *         description: User not found
  */
-router.get("/profile/:id", userController.getProfile);
+router.get('/profile/:id', userController.getProfile);
 
 /**
  * @swagger
@@ -112,7 +112,7 @@ router.get("/profile/:id", userController.getProfile);
  *       500:
  *         description: Error updating profile
  */
-router.patch("/profile/:id", userController.updateProfile);
+router.patch('/profile/:id', userController.updateProfile);
 
 /**
  * @swagger
@@ -132,6 +132,6 @@ router.patch("/profile/:id", userController.updateProfile);
  *       500:
  *         description: Error deleting user
  */
-router.delete("/user/:id", userController.deleteUser);
+router.delete('/user/:id', userController.deleteUser);
 
 export default router;

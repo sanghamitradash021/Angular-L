@@ -44,7 +44,7 @@
 
 //         // Insert recipe into database
 //         const [newRecipe] = await sequelize.query(
-//             `INSERT INTO Recipes (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt) 
+//             `INSERT INTO Recipes (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt)
 //           VALUES (:title, :user_id, :description, :ingredients, :instructions, :preparationTime, :difficulty, :cuisine, :mealType, :image, NOW(), NOW())`,
 //             {
 //                 replacements: {
@@ -81,9 +81,6 @@
 
 // export { createRecipe, upload };
 
-
-
-
 // /**
 //  * Retrieve a specific recipe by ID
 //  */
@@ -116,7 +113,7 @@
 //         const { query } = req.params;
 
 //         const recipes = await sequelize.query(
-//             `SELECT * FROM Recipes 
+//             `SELECT * FROM Recipes
 //              WHERE title LIKE :query OR ingredients LIKE :query OR cuisine LIKE :query OR mealType LIKE :query`,
 //             {
 //                 replacements: { query: `%${query}%` },
@@ -156,7 +153,6 @@
 //     }
 // };
 
-
 // /**
 //  * Update a recipe (only creator can update)
 //  */
@@ -179,13 +175,12 @@
 //             return;
 //         }
 
-
 //         const ingredientsJSON = JSON.stringify(ingredients);
 //         // Update the recipe
 //         await sequelize.query(
-//             `UPDATE Recipes 
-//              SET title = :title, description = :description, ingredients = :ingredients, 
-//                  instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+//             `UPDATE Recipes
+//              SET title = :title, description = :description, ingredients = :ingredients,
+//                  instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty,
 //                  cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
 //              WHERE recipe_id = :id`,
 //             {
@@ -200,14 +195,12 @@
 //     }
 // };
 
-
 // /**
 //  * Delete a recipe (only creator can delete)
 //  */
 // const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
 //     try {
 //         const { id } = req.params;
-
 
 //         // Delete the recipe
 //         await sequelize.query("DELETE FROM Recipes WHERE recipe_id = :id", {
@@ -274,7 +267,6 @@
 //  * Retrieve all available meal types
 //  */
 
-
 // /**
 //  * Retrieve all recipes created by a specific user (by user_id)
 //  */
@@ -309,9 +301,6 @@
 //     }
 // };
 
-
-
-
 // const recipeController = {
 //     createRecipe: createRecipe,
 //     getRecipeById: getRecipeById,
@@ -326,9 +315,9 @@
 // }
 // export default recipeController;
 
-import { Request, Response } from "express";
-import recipeRepository from "../repositories/recipeRepository";
-import multer from "multer";
+import { Request, Response } from 'express';
+import recipeRepository from '../repositories/recipeRepository';
+import multer from 'multer';
 
 // Set up multer for file uploads
 // const storage = multer.diskStorage({
@@ -370,14 +359,14 @@ import multer from "multer";
 //         console.log('Processed recipe data:', recipeData);
 
 //         const recipeId = await recipeRepository.createRecipe(recipeData);
-        
+
 //         if (!recipeId) {
 //             res.status(500).json({ message: "Failed to create recipe" });
 //             return;
 //         }
 
-//         res.status(201).json({ 
-//             message: "Recipe created successfully", 
+//         res.status(201).json({
+//             message: "Recipe created successfully",
 //             recipeId,
 //             recipe: recipeData
 //         });
@@ -388,85 +377,83 @@ import multer from "multer";
 // };
 
 const createRecipe = async (req: Request, res: Response): Promise<void> => {
-    try {
-        console.log('=== CREATE RECIPE REQUEST ===');
-        console.log('Request body:', req.body);
+  try {
+    console.log('=== CREATE RECIPE REQUEST ===');
+    console.log('Request body:', req.body);
 
-        // No more file processing - image comes as Cloudinary URL
-        const recipeData = {
-            title: req.body.title,
-            user_id: parseInt(req.body.user_id),
-            description: req.body.description,
-            ingredients: req.body.ingredients,
-            instructions: req.body.instructions,
-            preparationTime: parseInt(req.body.preparationTime),
-            difficulty: req.body.difficulty,
-            cuisine: req.body.cuisine,
-            mealType: req.body.mealType,
-            image: req.body.image || null // This is now a Cloudinary URL
-        };
+    // No more file processing - image comes as Cloudinary URL
+    const recipeData = {
+      title: req.body.title,
+      user_id: parseInt(req.body.user_id),
+      description: req.body.description,
+      ingredients: req.body.ingredients,
+      instructions: req.body.instructions,
+      preparationTime: parseInt(req.body.preparationTime),
+      difficulty: req.body.difficulty,
+      cuisine: req.body.cuisine,
+      mealType: req.body.mealType,
+      image: req.body.image || null, // This is now a Cloudinary URL
+    };
 
-        // Process ingredients if it's a string
-        if (typeof recipeData.ingredients === 'string') {
-            recipeData.ingredients = recipeData.ingredients
-                .split('\n')
-                .map((ingredient: string) => ingredient.trim())
-                .filter((ingredient: string) => ingredient.length > 0);
-        }
-
-        console.log('Processed recipe data:', recipeData);
-
-        const recipeId = await recipeRepository.createRecipe(recipeData);
-        
-        if (!recipeId) {
-            res.status(500).json({ message: "Failed to create recipe" });
-            return;
-        }
-
-        res.status(201).json({ 
-            message: "Recipe created successfully", 
-            recipeId,
-            recipe: recipeData
-        });
-    } catch (error) {
-        console.error('Error creating recipe:', error);
-        res.status(500).json({ message: "Error creating recipe", error });
+    // Process ingredients if it's a string
+    if (typeof recipeData.ingredients === 'string') {
+      recipeData.ingredients = recipeData.ingredients
+        .split('\n')
+        .map((ingredient: string) => ingredient.trim())
+        .filter((ingredient: string) => ingredient.length > 0);
     }
+
+    console.log('Processed recipe data:', recipeData);
+
+    const recipeId = await recipeRepository.createRecipe(recipeData);
+
+    if (!recipeId) {
+      res.status(500).json({ message: 'Failed to create recipe' });
+      return;
+    }
+
+    res.status(201).json({
+      message: 'Recipe created successfully',
+      recipeId,
+      recipe: recipeData,
+    });
+  } catch (error) {
+    console.error('Error creating recipe:', error);
+    res.status(500).json({ message: 'Error creating recipe', error });
+  }
 };
 
-
-
 const getRecipeById = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipe = await recipeRepository.findById(Number(req.params.id));
-        if (!recipe) {
-            res.status(404).json({ message: "Recipe not found" });
-            return;
-        }
-        res.json(recipe);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching recipe", error });
+  try {
+    const recipe = await recipeRepository.findById(Number(req.params.id));
+    if (!recipe) {
+      res.status(404).json({ message: 'Recipe not found' });
+      return;
     }
+    res.json(recipe);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recipe', error });
+  }
 };
 
 const searchRecipes = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipes = await recipeRepository.searchRecipes(req.params.query);
-        res.json(recipes);
-    } catch (error) {
-        res.status(500).json({ message: "Error searching recipes", error });
-    }
+  try {
+    const recipes = await recipeRepository.searchRecipes(req.params.query);
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: 'Error searching recipes', error });
+  }
 };
 
 const getAllRecipes = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { page = 1, limit = 100 } = req.query;
-        const offset = (Number(page) - 1) * Number(limit);
-        const recipes = await recipeRepository.getAllRecipes(Number(limit), offset);
-        res.json(recipes);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching recipes", error });
-    }
+  try {
+    const { page = 1, limit = 100 } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+    const recipes = await recipeRepository.getAllRecipes(Number(limit), offset);
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
 };
 
 // const updateRecipe = async (req: Request, res: Response): Promise<void> => {
@@ -483,45 +470,44 @@ const getAllRecipes = async (req: Request, res: Response): Promise<void> => {
 //     }
 // };
 
-
 const updateRecipe = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipeId = parseInt(req.params.id);
-        const recipeData = {
-            title: req.body.title,
-            description: req.body.description,
-            ingredients: req.body.ingredients,
-            instructions: req.body.instructions,
-            preparationTime: parseInt(req.body.preparationTime),
-            difficulty: req.body.difficulty,
-            cuisine: req.body.cuisine,
-            mealType: req.body.mealType,
-            image: req.body.image || null
-        };
+  try {
+    const recipeId = parseInt(req.params.id);
+    const recipeData = {
+      title: req.body.title,
+      description: req.body.description,
+      ingredients: req.body.ingredients,
+      instructions: req.body.instructions,
+      preparationTime: parseInt(req.body.preparationTime),
+      difficulty: req.body.difficulty,
+      cuisine: req.body.cuisine,
+      mealType: req.body.mealType,
+      image: req.body.image || null,
+    };
 
-        // Process ingredients if it's a string
-        if (typeof recipeData.ingredients === 'string') {
-            recipeData.ingredients = recipeData.ingredients
-                .split('\n')
-                .map((ingredient: string) => ingredient.trim())
-                .filter((ingredient: string) => ingredient.length > 0);
-        }
-
-        const updatedRecipe = await recipeRepository.updateRecipe(recipeId, recipeData);
-        
-        if (!updatedRecipe) {
-            res.status(404).json({ message: "Recipe not found" });
-            return;
-        }
-
-        res.status(200).json({ 
-            message: "Recipe updated successfully", 
-            recipe: updatedRecipe 
-        });
-    } catch (error) {
-        console.error('Error updating recipe:', error);
-        res.status(500).json({ message: "Error updating recipe", error });
+    // Process ingredients if it's a string
+    if (typeof recipeData.ingredients === 'string') {
+      recipeData.ingredients = recipeData.ingredients
+        .split('\n')
+        .map((ingredient: string) => ingredient.trim())
+        .filter((ingredient: string) => ingredient.length > 0);
     }
+
+    const updatedRecipe = await recipeRepository.updateRecipe(recipeId, recipeData);
+
+    if (!updatedRecipe) {
+      res.status(404).json({ message: 'Recipe not found' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Recipe updated successfully',
+      recipe: updatedRecipe,
+    });
+  } catch (error) {
+    console.error('Error updating recipe:', error);
+    res.status(500).json({ message: 'Error updating recipe', error });
+  }
 };
 
 // const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
@@ -537,78 +523,85 @@ const updateRecipe = async (req: Request, res: Response): Promise<void> => {
 //     }
 // };
 
-
 // In your recipeController.ts
 const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipeId = parseInt(req.params.id);
-        
-        console.log('Attempting to delete recipe with ID:', recipeId);
-        
-        // First check if recipe exists
-        const existingRecipe = await recipeRepository.findById(recipeId);
-        
-        if (!existingRecipe) {
-            console.log('Recipe not found - may have been already deleted');
-            res.status(404).json({ 
-                message: "Recipe not found - may have been already deleted",
-                success: false,
-                recipeId: recipeId
-            });
-            return;
-        }
-        
-        const deleted = await recipeRepository.deleteRecipe(recipeId);
-        
-        if (deleted) {
-            res.status(200).json({ 
-                message: "Recipe deleted successfully",
-                success: true,
-                recipeId: recipeId
-            });
-        } else {
-            res.status(500).json({ 
-                message: "Failed to delete recipe",
-                success: false 
-            });
-        }
-    } catch (error) {
-        console.error('Error deleting recipe:', error);
-        res.status(500).json({ 
-            message: "Error deleting recipe", 
-            error: error,
-            success: false
-        });
+  try {
+    const recipeId = parseInt(req.params.id);
+
+    console.log('Attempting to delete recipe with ID:', recipeId);
+
+    // First check if recipe exists
+    const existingRecipe = await recipeRepository.findById(recipeId);
+
+    if (!existingRecipe) {
+      console.log('Recipe not found - may have been already deleted');
+      res.status(404).json({
+        message: 'Recipe not found - may have been already deleted',
+        success: false,
+        recipeId: recipeId,
+      });
+      return;
     }
+
+    const deleted = await recipeRepository.deleteRecipe(recipeId);
+
+    if (deleted) {
+      res.status(200).json({
+        message: 'Recipe deleted successfully',
+        success: true,
+        recipeId: recipeId,
+      });
+    } else {
+      res.status(500).json({
+        message: 'Failed to delete recipe',
+        success: false,
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting recipe:', error);
+    res.status(500).json({
+      message: 'Error deleting recipe',
+      error: error,
+      success: false,
+    });
+  }
 };
 
-
-
 const getRecipesByCuisine = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipes = await recipeRepository.getRecipesByCuisine(req.params.cuisine);
-        res.json(recipes);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching recipes", error });
-    }
+  try {
+    const recipes = await recipeRepository.getRecipesByCuisine(req.params.cuisine);
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
 };
 
 const getRecipesByMealType = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipes = await recipeRepository.getRecipesByMealType(req.params.mealType);
-        res.json(recipes);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching recipes", error });
-    }
+  try {
+    const recipes = await recipeRepository.getRecipesByMealType(req.params.mealType);
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
 };
 
 const getUserRecipes = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const recipes = await recipeRepository.getUserRecipes(Number(req.params.userId));
-        res.json(recipes);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching recipes", error });
-    }
+  try {
+    const recipes = await recipeRepository.getUserRecipes(Number(req.params.userId));
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
 };
 
-export default { createRecipe, getRecipeById, searchRecipes, getAllRecipes, updateRecipe, deleteRecipe, getRecipesByCuisine, getRecipesByMealType, getUserRecipes };
+export default {
+  createRecipe,
+  getRecipeById,
+  searchRecipes,
+  getAllRecipes,
+  updateRecipe,
+  deleteRecipe,
+  getRecipesByCuisine,
+  getRecipesByMealType,
+  getUserRecipes,
+};
