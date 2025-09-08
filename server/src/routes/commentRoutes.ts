@@ -17,8 +17,8 @@
 
 // export default router;
 
-import express from "express";
-import commentController from "../controllers/commentController"; // Adjust the import path as needed
+import express from 'express';
+import commentController from '../controllers/commentController'; // Adjust the import path as needed
 
 const router = express.Router();
 
@@ -61,8 +61,7 @@ const router = express.Router();
  *       500:
  *         description: Error adding comment
  */
-router.post("/:recipeId", commentController.addComment);
-
+router.post('/:recipeId', commentController.addComment);
 
 /**
  * @swagger
@@ -83,7 +82,7 @@ router.post("/:recipeId", commentController.addComment);
  *       500:
  *         description: Error fetching comments
  */
-router.get("/:recipeId", commentController.getComments);
+router.get('/:recipeId', commentController.getComments);
 
 /**
  * @swagger
@@ -119,7 +118,7 @@ router.get("/:recipeId", commentController.getComments);
  *       500:
  *         description: Error updating comment
  */
-router.put("/", commentController.updateComment);
+router.put('/', commentController.updateComment);
 
 /**
  * @swagger
@@ -151,7 +150,6 @@ router.put("/", commentController.updateComment);
  *       500:
  *         description: Error deleting comment
  */
-router.delete("/", commentController.deleteComment);
+router.delete('/', commentController.deleteComment);
 
 export default router;
-
