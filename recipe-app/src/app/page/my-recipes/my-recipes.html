@@ -1,0 +1,193 @@
+<div class="min-h-screen w-full bg-gradient-to-br from-orange-50 via-pink-50 to-rose-100 relative overflow-hidden px-4 sm:px-6 lg:px-8 py-12 pt-20">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-200/30 to-orange-200/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto">
+    <!-- Enhanced header with animation -->
+    <div class="text-center mb-12 animate-fade-in-up">
+      <h2 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
+        My Culinary Creations
+      </h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto rounded-full"></div>
+    </div>
+
+    <!-- Enhanced Sorting Controls -->
+    @if (myRecipes.length > 0) {
+      <div class="flex justify-end mb-12 animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <label for="sort-select" class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+            </svg>
+            Sort by:
+          </label>
+          <select
+            id="sort-select"
+            [(ngModel)]="sortBy"
+            (ngModelChange)="sortRecipes()"
+            class="block w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 hover:border-orange-300 cursor-pointer"
+          >
+            <option value="newest">✨ Newly Created First</option>
+            <option value="cuisine">🌍 Cuisine (A-Z)</option>
+            <option value="title">📝 Title (A-Z)</option>
+            <option value="difficulty">⚡ Difficulty</option>
+          </select>
+        </div>
+      </div>
+    }
+
+    @if (loading) {
+      <!-- Enhanced loading state -->
+      <div class="flex flex-col items-center justify-center py-20 animate-fade-in">
+        <div class="relative">
+          <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
+          <div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-pink-600 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+        </div>
+        <p class="mt-6 text-lg text-gray-600 font-medium animate-pulse">Loading your delicious recipes...</p>
+      </div>
+    } @else if (error) {
+      <!-- Enhanced error state -->
+      <div class="text-center py-20 animate-fade-in">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <p class="text-red-600 text-lg font-medium">{{ error }}</p>
+      </div>
+    } @else if (myRecipes.length > 0) {
+      <!-- Enhanced recipe grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        @for (recipe of myRecipes; track recipe.recipe_id; let i = $index) {
+          <div 
+            class="group bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20 animate-fade-in-up hover:shadow-orange-200/50"
+            [style.animation-delay]="(i * 0.1) + 's'"
+          >
+            <!-- Enhanced image container -->
+            <div class="relative h-56 overflow-hidden">
+              <img 
+                [src]="recipe.image || '/placeholder.svg?height=224&width=400'" 
+                [alt]="recipe.title" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <!-- Floating difficulty badge -->
+              <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700 shadow-lg">
+                {{ recipe.difficulty || 'Medium' }}
+              </div>
+            </div>
+            
+            <!-- Enhanced content -->
+            <div class="p-6">
+              <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-orange-600 transition-colors duration-300 line-clamp-2">
+                {{ recipe.title }}
+              </h3>
+              <p class="text-gray-600 mb-4 line-clamp-2 text-sm leading-relaxed">
+                {{ recipe.description }}
+              </p>
+              
+              <!-- Enhanced cuisine tag -->
+              @if (recipe.cuisine) {
+                <div class="mb-4">
+                  <span class="inline-block bg-gradient-to-r from-orange-100 to-pink-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">
+                    {{ recipe.cuisine }}
+                  </span>
+                </div>
+              }
+              
+              <!-- Enhanced action buttons -->
+              <div class="flex gap-2 mt-6">
+                <a 
+                  [routerLink]="['/recipe', recipe.recipe_id]" 
+                  class="flex-1 text-center bg-gradient-to-r from-orange-600 to-pink-600 text-white py-3 rounded-xl hover:from-orange-700 hover:to-pink-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  View
+                </a>
+                <button 
+                  (click)="openEditModal(recipe)" 
+                  class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Edit
+                </button>
+                <button 
+                  (click)="deleteRecipe(recipe.recipe_id)" 
+                  class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Enhanced empty state -->
+      <div class="text-center py-20 animate-fade-in">
+        <div class="w-24 h-24 bg-gradient-to-br from-orange-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-12 h-12 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-700 mb-4">No recipes yet</h3>
+        <p class="text-gray-500 mb-8 max-w-md mx-auto">Start your culinary journey by creating your first delicious recipe!</p>
+        <a 
+          routerLink="/create-recipe" 
+          class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-600 to-pink-600 text-white rounded-2xl hover:from-orange-700 hover:to-pink-700 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Create Your First Recipe
+        </a>
+      </div>
+    }
+  </div>
+</div>
+
+<app-edit-recipe-modal 
+  [isOpen]="isEditModalOpen"
+  [recipe]="selectedRecipe" 
+  (close)="isEditModalOpen = false" 
+  (success)="onRecipeUpdated($event)">
+</app-edit-recipe-modal>
+
+<style>
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

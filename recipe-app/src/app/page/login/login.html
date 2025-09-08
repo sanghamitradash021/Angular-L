@@ -1,0 +1,105 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-pink-50 to-rose-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Added animated background elements for consistency -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-200/30 to-orange-200/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+
+  <div class="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-white/20 relative z-10 animate-fade-in-up">
+    <div class="text-center">
+      <!-- Enhanced title with gradient text and animation -->
+      <h2 class="mt-6 text-4xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
+        Welcome Back
+      </h2>
+      <div class="w-16 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto rounded-full mb-4"></div>
+      <p class="text-gray-600 font-medium">
+        Sign in to your culinary account
+      </p>
+    </div>
+
+    @if (error) {
+      <!-- Enhanced error styling -->
+      <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl shadow-md animate-fade-in" role="alert">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <p class="font-semibold">Error</p>
+            <p>{{ error }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div class="space-y-4">
+        <!-- Enhanced input fields with floating labels and better styling -->
+        <div class="relative">
+          <input formControlName="email" id="email" name="email" type="email" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Email address">
+          <label for="email" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Email address
+          </label>
+        </div>
+        <div class="relative">
+          <input formControlName="password" id="password" name="password" type="password" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Password">
+          <label for="password" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Password
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <!-- Enhanced button with gradient and animations -->
+        <button type="submit" [disabled]="loginForm.invalid"
+          class="group relative w-full flex justify-center items-center py-4 px-6 border border-transparent text-sm font-semibold rounded-2xl text-white bg-gradient-to-r from-orange-600 to-pink-600 hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5">
+          <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          Sign in
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center">
+      <!-- Enhanced link styling -->
+      <a routerLink="/signup" class="font-medium text-orange-600 hover:text-pink-600 transition-colors duration-300 hover:underline">
+        Don't have an account? <span class="font-semibold">Sign up</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+</style>
