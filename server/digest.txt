@@ -1,0 +1,3400 @@
+Directory structure:
+└── server/
+    ├── package.json
+    ├── tsconfig.json
+    └── src/
+        ├── index.ts
+        ├── swagger.ts
+        ├── config/
+        │   └── database.ts
+        ├── controllers/
+        │   ├── commentController.ts
+        │   ├── favoriteController.ts
+        │   ├── ratingController.ts
+        │   ├── recipeController.ts
+        │   └── userController.ts
+        ├── middleware/
+        │   ├── authMiddleware.ts
+        │   └── errorHandler.ts
+        ├── models/
+        │   ├── comment.ts
+        │   ├── favorite.ts
+        │   ├── rating.ts
+        │   ├── recipe.ts
+        │   ├── recipetag.ts
+        │   ├── syncmodel.ts
+        │   ├── tag.ts
+        │   └── user.ts
+        ├── repositories/
+        │   ├── commentRepository.ts
+        │   ├── ratingRepository.ts
+        │   ├── recipeRepository.ts
+        │   └── userRepository.ts
+        └── routes/
+            ├── commentRoutes.ts
+            ├── ratingRoutes.ts
+            ├── recipeRoutes.ts
+            └── userRoutes.ts
+
+================================================
+FILE: package.json
+================================================
+{
+  "name": "node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/mysql": "^2.15.26",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.13.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.7",
+    "nodemon": "^3.1.9",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
+
+
+
+================================================
+FILE: tsconfig.json
+================================================
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    /* Projects */
+    // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
+    // "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
+    // "tsBuildInfoFile": "./.tsbuildinfo",              /* Specify the path to .tsbuildinfo incremental compilation file. */
+    // "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects. */
+    // "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
+    // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
+
+    /* Language and Environment */
+    "target": "ES2022",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    // "jsx": "preserve",                                /* Specify what JSX code is generated. */
+    // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
+    // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
+    // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
+    // "jsxFragmentFactory": "",                         /* Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'. */
+    // "jsxImportSource": "",                            /* Specify module specifier used to import the JSX factory functions when using 'jsx: react-jsx*'. */
+    // "reactNamespace": "",                             /* Specify the object invoked for 'createElement'. This only applies when targeting 'react' JSX emit. */
+    // "noLib": true,                                    /* Disable including any library files, including the default lib.d.ts. */
+    // "useDefineForClassFields": true,                  /* Emit ECMAScript-standard-compliant class fields. */
+    // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
+
+    /* Modules */
+    "module": "commonjs",                                /* Specify what module code is generated. */
+    "rootDir": "./src",                                  /* Specify the root folder within your source files. */
+    "moduleResolution": "node",                     /* Specify how TypeScript looks up a file from a given module specifier. */
+    // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
+    // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
+    // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
+    // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
+    // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
+    // "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */
+    // "allowImportingTsExtensions": true,               /* Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set. */
+    // "rewriteRelativeImportExtensions": true,          /* Rewrite '.ts', '.tsx', '.mts', and '.cts' file extensions in relative import paths to their JavaScript equivalent in output files. */
+    // "resolvePackageJsonExports": true,                /* Use the package.json 'exports' field when resolving package imports. */
+    // "resolvePackageJsonImports": true,                /* Use the package.json 'imports' field when resolving imports. */
+    // "customConditions": [],                           /* Conditions to set in addition to the resolver-specific defaults when resolving imports. */
+    // "noUncheckedSideEffectImports": true,             /* Check side effect imports. */
+    // "resolveJsonModule": true,                        /* Enable importing .json files. */
+    // "allowArbitraryExtensions": true,                 /* Enable importing files with any extension, provided a declaration file is present. */
+    // "noResolve": true,                                /* Disallow 'import's, 'require's or '<reference>'s from expanding the number of files TypeScript should add to a project. */
+
+    /* JavaScript Support */
+    // "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
+    // "checkJs": true,                                  /* Enable error reporting in type-checked JavaScript files. */
+    // "maxNodeModuleJsDepth": 1,                        /* Specify the maximum folder depth used for checking JavaScript files from 'node_modules'. Only applicable with 'allowJs'. */
+
+    /* Emit */
+    // "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
+    // "declarationMap": true,                           /* Create sourcemaps for d.ts files. */
+    // "emitDeclarationOnly": true,                      /* Only output d.ts files and not JavaScript files. */
+    // "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
+    // "inlineSourceMap": true,                          /* Include sourcemap files inside the emitted JavaScript. */
+    // "noEmit": true,                                   /* Disable emitting files from a compilation. */
+    // "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
+    "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+    // "removeComments": true,                           /* Disable emitting comments. */
+    // "importHelpers": true,                            /* Allow importing helper functions from tslib once per project, instead of including them per-file. */
+    // "downlevelIteration": true,                       /* Emit more compliant, but verbose and less performant JavaScript for iteration. */
+    // "sourceRoot": "",                                 /* Specify the root path for debuggers to find the reference source code. */
+    // "mapRoot": "",                                    /* Specify the location where debugger should locate map files instead of generated locations. */
+    // "inlineSources": true,                            /* Include source code in the sourcemaps inside the emitted JavaScript. */
+    // "emitBOM": true,                                  /* Emit a UTF-8 Byte Order Mark (BOM) in the beginning of output files. */
+    // "newLine": "crlf",                                /* Set the newline character for emitting files. */
+    // "stripInternal": true,                            /* Disable emitting declarations that have '@internal' in their JSDoc comments. */
+    // "noEmitHelpers": true,                            /* Disable generating custom helper functions like '__extends' in compiled output. */
+    // "noEmitOnError": true,                            /* Disable emitting files if any type checking errors are reported. */
+    // "preserveConstEnums": true,                       /* Disable erasing 'const enum' declarations in generated code. */
+    // "declarationDir": "./",                           /* Specify the output directory for generated declaration files. */
+
+    /* Interop Constraints */
+    // "isolatedModules": true,                          /* Ensure that each file can be safely transpiled without relying on other imports. */
+    // "verbatimModuleSyntax": true,                     /* Do not transform or elide any imports or exports not marked as type-only, ensuring they are written in the output file's format based on the 'module' setting. */
+    // "isolatedDeclarations": true,                     /* Require sufficient annotation on exports so other tools can trivially generate declaration files. */
+    // "allowSyntheticDefaultImports": true,             /* Allow 'import x from y' when a module doesn't have a default export. */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+
+    /* Type Checking */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    // "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
+    // "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
+    // "strictFunctionTypes": true,                      /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
+    // "strictBindCallApply": true,                      /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
+    // "strictPropertyInitialization": true,             /* Check for class properties that are declared but not set in the constructor. */
+    // "strictBuiltinIteratorReturn": true,              /* Built-in iterators are instantiated with a 'TReturn' type of 'undefined' instead of 'any'. */
+    // "noImplicitThis": true,                           /* Enable error reporting when 'this' is given the type 'any'. */
+    // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */
+    // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
+    // "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
+    // "noUnusedParameters": true,                       /* Raise an error when a function parameter isn't read. */
+    // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
+    // "noImplicitReturns": true,                        /* Enable error reporting for codepaths that do not explicitly return in a function. */
+    // "noFallthroughCasesInSwitch": true,               /* Enable error reporting for fallthrough cases in switch statements. */
+    // "noUncheckedIndexedAccess": true,                 /* Add 'undefined' to a type when accessed using an index. */
+    // "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
+    // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
+    // "allowUnusedLabels": true,                        /* Disable error reporting for unused labels. */
+    // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
+
+    /* Completeness */
+    // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
+    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+  }
+}
+
+
+
+================================================
+FILE: src/index.ts
+================================================
+import express from "express";
+// import bodyParser from "body-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import { sequelize } from "./config/database";
+import syncTables from "./models/syncmodel";
+import userRoutes from "./routes/userRoutes";
+import recipeRoutes from "./routes/recipeRoutes";
+import ratingRoutes from "./routes/ratingRoutes";
+import commentRoutes from "./routes/commentRoutes";
+import { swaggerDocs } from './swagger';
+import { errorHandler } from "./middleware/errorHandler";
+
+import { QueryTypes } from "sequelize";
+import path from "path";
+
+dotenv.config();
+
+const app = express();
+const PORT: number = Number(process.env.PORT) || 3000;
+// const bodyParser = require('body-parser');
+swaggerDocs(app, PORT);
+
+app.use(cors());
+app.use(express.json());
+// app.use(bodyParser.json());
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use("/api/USERS", userRoutes);
+app.use("/api/recipes", recipeRoutes);
+app.use("/api/ratings", ratingRoutes);
+app.use("/api/comments", commentRoutes);
+app.use(errorHandler);
+
+const startServer = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log("Database connected successfully.");
+
+        await syncTables();
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
+    }
+};
+
+startServer();
+
+
+
+================================================
+FILE: src/swagger.ts
+================================================
+import { Express, Request, Response } from 'express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+const options: swaggerJsdoc.Options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Recipe Sharing API',
+            version: '1.0.0',
+            description: 'API for managing users, recipes, ratings, and comments.',
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000/api/USERS',
+                description: 'User API Server',
+            },
+            {
+                url: 'http://localhost:3000/api/recipes',
+                description: 'Recipe API Server',
+            },
+            {
+                url: 'http://localhost:3000/api/ratings',
+                description: 'Ratings API Server',
+            },
+            {
+                url: 'http://localhost:3000/api/comments',
+                description: 'Comments API Server',
+            },
+        ],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+    },
+    apis: [
+        './src/routes/userRoutes.ts',
+        './src/routes/recipeRoutes.ts',
+        './src/routes/ratingRoutes.ts',
+        './src/routes/commentRoutes.ts',
+    ],
+};
+
+const specs = swaggerJsdoc(options);
+
+export const swaggerDocs = (app: Express, port: number): void => {
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: "API Documentation",
+    }));
+
+    app.get('/docs.json', (req: Request, res: Response) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(specs);
+    });
+
+    console.log(`📚 Docs available at http://localhost:${port}/docs`);
+};
+
+
+
+================================================
+FILE: src/config/database.ts
+================================================
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv"
+
+dotenv.config()
+
+export const sequelize = new Sequelize(
+
+    process.env.DB_NAME || "recipe_sharing_platform",
+    process.env.DB_USER || "root",
+    process.env.DB_PASSWORD || "localhost",
+    {
+        host: process.env.DB_HOST || "localhost",
+        dialect: "mysql",
+        logging: false,
+    },
+)
+
+
+
+================================================
+FILE: src/controllers/commentController.ts
+================================================
+// import { Request, Response } from "express";
+// import { sequelize } from "../config/database";
+// import { QueryTypes } from "sequelize";
+
+// const addComment = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { userId, content } = req.body;
+//         const { recipeId } = req.params;
+
+//         const [newComment] = await sequelize.query(
+//             `INSERT INTO Comments (recipe_id, user_id, content, createdAt, updatedAt) 
+//                 VALUES (:recipeId, :userId, :content, NOW(), NOW())`,
+//             {
+//                 replacements: {
+//                     recipeId,
+//                     userId,
+//                     content,
+//                 },
+//                 type: QueryTypes.INSERT,
+//             }
+//         );
+
+//         res.status(201).json({ message: "Comment added successfully" });
+//     } catch (error: any) {
+//         // Log the detailed error for debugging
+//         console.error("Error adding comment:", error);
+
+//         res.status(500).json({ message: "Error adding comment", error: error.message });
+//     }
+// };
+
+
+
+// const getComments = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { recipeId } = req.params;
+
+//         const comments = await sequelize.query(
+//             "SELECT * FROM Comments WHERE recipe_id = :recipeId",
+//             {
+//                 replacements: { recipeId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         res.status(200).json(comments);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching comments", error });
+//     }
+// };
+
+// const updateComment = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { commentId, userId, content } = req.body;
+
+//         // Check if the comment exists and belongs to the user
+//         const [existingComment] = await sequelize.query(
+//             "SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId",
+//             {
+//                 replacements: { commentId, userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!existingComment) {
+//             res.status(404).json({ message: "Comment not found or unauthorized" });
+//             return;
+//         }
+
+//         // Update comment content
+//         await sequelize.query(
+//             "UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId",
+//             {
+//                 replacements: { content, commentId },
+//                 type: QueryTypes.UPDATE,
+//             }
+//         );
+
+//         res.status(200).json({ message: "Comment updated successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error updating comment", error });
+//     }
+// };
+
+// const deleteComment = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { commentId, userId } = req.body;
+
+//         // Check if the comment exists and belongs to the user
+//         const [existingComment] = await sequelize.query(
+//             "SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId",
+//             {
+//                 replacements: { commentId, userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!existingComment) {
+//             res.status(404).json({ message: "Comment not found or unauthorized" });
+//             return;
+//         }
+
+//         // Mark the comment as deleted
+//         await sequelize.query(
+//             "UPDATE Comments SET is_deleted = 1 WHERE comment_id = :commentId",
+//             {
+//                 replacements: { commentId },
+//                 type: QueryTypes.UPDATE,
+//             }
+//         );
+
+//         res.status(200).json({ message: "Comment deleted successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error deleting comment", error });
+//     }
+// };
+
+// export default {
+//     addComment,
+//     getComments,
+//     updateComment,
+//     deleteComment,
+// };
+
+
+import { Request, Response } from "express";
+import CommentRepository from "../repositories/commentRepository";
+
+const addComment = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId, content } = req.body;
+        const { recipeId } = req.params;
+
+        // Add the comment using the repository
+        await CommentRepository.addComment(Number(recipeId), userId, content);
+
+        res.status(201).json({ message: "Comment added successfully" });
+    } catch (error: any) {
+        console.error("Error adding comment:", error);
+        res.status(500).json({ message: "Error adding comment", error: error.message });
+    }
+};
+
+const getComments = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { recipeId } = req.params;
+
+        // Get the comments from the repository
+        const comments = await CommentRepository.getCommentsByRecipe(Number(recipeId));
+
+        res.status(200).json(comments);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching comments", error });
+    }
+};
+
+const updateComment = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { commentId, userId, content } = req.body;
+
+        // Check if the comment exists and belongs to the user
+        const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+
+        if (!existingComment) {
+            res.status(404).json({ message: "Comment not found or unauthorized" });
+            return;
+        }
+
+        // Update the comment using the repository
+        await CommentRepository.updateComment(commentId, content);
+
+        res.status(200).json({ message: "Comment updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating comment", error });
+    }
+};
+
+const deleteComment = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { commentId, userId } = req.body;
+
+        // Check if the comment exists and belongs to the user
+        const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+
+        if (!existingComment) {
+            res.status(404).json({ message: "Comment not found or unauthorized" });
+            return;
+        }
+
+        // Delete the comment using the repository
+        await CommentRepository.deleteComment(commentId);
+
+        res.status(200).json({ message: "Comment deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting comment", error });
+    }
+};
+
+export default {
+    addComment,
+    getComments,
+    updateComment,
+    deleteComment,
+};
+
+
+
+================================================
+FILE: src/controllers/favoriteController.ts
+================================================
+// import { Request, Response } from "express";
+// import { sequelize } from "../config/db";
+// import { QueryTypes } from "sequelize";
+
+// const addFavorite = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { userId, recipeId } = req.body;
+
+//         // Check if the recipe is already in favorites
+//         const [existingFavorite] = await sequelize.query(
+//             "SELECT * FROM Favorites WHERE user_id = :userId AND recipe_id = :recipeId",
+//             {
+//                 replacements: { userId, recipeId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (existingFavorite) {
+//             res.status(400).json({ message: "Recipe already in favorites" });
+//             return;
+//         }
+
+//         // Add recipe to favorites
+//         await sequelize.query(
+//             "INSERT INTO Favorites (user_id, recipe_id, created_at) VALUES (:userId, :recipeId, NOW())",
+//             {
+//                 replacements: { userId, recipeId },
+//                 type: QueryTypes.INSERT,
+//             }
+//         );
+
+//         res.status(201).json({ message: "Recipe added to favorites" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error adding to favorites", error });
+//     }
+// };
+
+// const getFavorites = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { userId } = req.params;
+
+//         const favorites = await sequelize.query(
+//             "SELECT * FROM Recipes WHERE recipe_id IN (SELECT recipe_id FROM Favorites WHERE user_id = :userId)",
+//             {
+//                 replacements: { userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         res.status(200).json(favorites);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching favorites", error });
+//     }
+// };
+
+// const removeFavorite = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { userId, recipeId } = req.body;
+
+// // Remove the
+//     }
+
+
+================================================
+FILE: src/controllers/ratingController.ts
+================================================
+// import { Request, Response } from "express";
+// import { sequelize } from "../config/database";
+// import { QueryTypes } from "sequelize";
+
+// const addRating = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { recipeId, userId, rating } = req.body;
+
+//         // Check if the user has already rated the recipe
+//         const [existingRating] = await sequelize.query(
+//             "SELECT * FROM Ratings WHERE recipe_id = :recipeId AND user_id = :userId",
+//             {
+//                 replacements: { recipeId, userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (existingRating) {
+//             // ✅ If rating exists, update it instead of blocking
+//             await sequelize.query(
+//                 "UPDATE Ratings SET rating = :rating, updatedAt = NOW() WHERE recipe_id = :recipeId AND user_id = :userId",
+//                 {
+//                     replacements: { recipeId, userId, rating },
+//                     type: QueryTypes.UPDATE,
+//                 }
+//             );
+
+//             res.status(200).json({ message: "Rating updated successfully" });
+//             return;
+//         }
+
+//         // If no existing rating, insert a new one
+//         await sequelize.query(
+//             "INSERT INTO Ratings (recipe_id, user_id, rating, createdAt, updatedAt) VALUES (:recipeId, :userId, :rating, NOW(), NOW())",
+//             {
+//                 replacements: { recipeId, userId, rating },
+//                 type: QueryTypes.INSERT,
+//             }
+//         );
+
+//         res.status(201).json({ message: "Rating added successfully" });
+//     } catch (error) {
+//         console.error("❌ Error adding/updating rating:", error);
+//         res.status(500).json({ message: "Error adding/updating rating", error });
+//     }
+// };
+
+
+// const getRating = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         console.log("✅ getRating controller called with recipeId:", req.params.recipeId);
+
+//         const { recipeId } = req.params;
+
+//         // Get average rating for the recipe
+//         const [averageRating] = await sequelize.query(
+//             "SELECT AVG(rating) AS avg_rating FROM Ratings WHERE recipe_id = :recipeId",
+//             {
+//                 replacements: { recipeId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         console.log("✅ Retrieved rating:", averageRating);
+
+//         // ✅ Ensure a response is sent
+//         res.status(200).json({ averageRating: averageRating });
+//     } catch (error) {
+//         console.error("❌ Error in getRating:", error);
+//         res.status(500).json({ message: "Error fetching rating", error });
+//     }
+// };
+// const updateRating = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { ratingId, userId, rating } = req.body;
+
+//         // Check if the rating exists and belongs to the user
+//         const [existingRating] = await sequelize.query(
+//             "SELECT * FROM Ratings WHERE rate_id = :ratingId AND user_id = :userId",
+//             {
+//                 replacements: { ratingId, userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!existingRating) {
+//             res.status(404).json({ message: "Rating not found or unauthorized" });
+//             return;
+//         }
+
+//         // Update the rating
+//         await sequelize.query(
+//             "UPDATE Ratings SET rating = :rating, updatedAt = NOW() WHERE rate_id = :ratingId",
+//             {
+//                 replacements: { rating, ratingId },
+//                 type: QueryTypes.UPDATE,
+//             }
+//         );
+
+//         res.status(200).json({ message: "Rating updated successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error updating rating", error });
+//     }
+// };
+
+// const deleteRating = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { ratingId, userId } = req.body;
+
+//         // Check if the rating exists and belongs to the user
+//         const [existingRating] = await sequelize.query(
+//             "SELECT * FROM Ratings WHERE rate_id = :ratingId AND user_id = :userId",
+//             {
+//                 replacements: { ratingId, userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!existingRating) {
+//             res.status(404).json({ message: "Rating not found or unauthorized" });
+//             return;
+//         }
+
+//         // Delete the rating
+//         await sequelize.query(
+//             "DELETE FROM Ratings WHERE rate_id = :ratingId",
+//             {
+//                 replacements: { ratingId },
+//                 type: QueryTypes.DELETE,
+//             }
+//         );
+
+//         res.status(200).json({ message: "Rating deleted successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error deleting rating", error });
+//     }
+// };
+
+// export default {
+//     addRating,
+//     getRating,
+//     updateRating,
+//     deleteRating,
+// };
+
+
+import { Request, Response } from "express";
+import RatingRepository from "../repositories/ratingRepository";
+
+const addRating = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { recipeId, userId, rating } = req.body;
+
+        // Check if the user has already rated the recipe
+        const existingRating = await RatingRepository.getRatingByUserAndRecipe(recipeId, userId);
+
+        if (existingRating) {
+            // Update existing rating
+            await RatingRepository.updateRating(recipeId, userId, rating);
+            res.status(200).json({ message: "Rating updated successfully" });
+        } else {
+            // Add new rating
+            await RatingRepository.addRating(recipeId, userId, rating);
+            res.status(201).json({ message: "Rating added successfully" });
+        }
+    } catch (error) {
+        console.error("❌ Error adding/updating rating:", error);
+        res.status(500).json({ message: "Error adding/updating rating", error });
+    }
+};
+
+const getRating = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { recipeId } = req.params;
+
+        // Get average rating for the recipe
+        const averageRating = await RatingRepository.getAverageRating(Number(recipeId));
+
+        res.status(200).json({ averageRating });
+    } catch (error) {
+        console.error("❌ Error in getRating:", error);
+        res.status(500).json({ message: "Error fetching rating", error });
+    }
+};
+
+const updateRating = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { ratingId, userId, rating } = req.body;
+
+        // Check if the rating exists and belongs to the user
+        const existingRating = await RatingRepository.getRatingByIdAndUser(ratingId, userId);
+
+        if (!existingRating) {
+            res.status(404).json({ message: "Rating not found or unauthorized" });
+            return;
+        }
+
+        // Update the rating
+        await RatingRepository.updateRating(existingRating.recipe_id, userId, rating);
+        res.status(200).json({ message: "Rating updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating rating", error });
+    }
+};
+
+const deleteRating = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { ratingId, userId } = req.body;
+
+        // Check if the rating exists and belongs to the user
+        const existingRating = await RatingRepository.getRatingByIdAndUser(ratingId, userId);
+
+        if (!existingRating) {
+            res.status(404).json({ message: "Rating not found or unauthorized" });
+            return;
+        }
+
+        // Delete the rating
+        await RatingRepository.deleteRating(ratingId);
+        res.status(200).json({ message: "Rating deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting rating", error });
+    }
+};
+
+export default {
+    addRating,
+    getRating,
+    updateRating,
+    deleteRating,
+};
+
+
+
+================================================
+FILE: src/controllers/recipeController.ts
+================================================
+// import { Request, Response } from "express";
+// import { sequelize } from "../config/database";
+// import { QueryTypes } from "sequelize";
+// import multer from 'multer';
+// // import Recipe from "../models/recipe";
+
+// /**
+//  * Create a new recipe
+//  */
+
+// // Set up multer for file uploads
+// const storage = multer.diskStorage({
+//     destination: (_req, _file, cb) => {
+//         cb(null, 'uploads/'); // Folder where uploaded images will be saved
+//     },
+//     filename: (_req, file, cb) => {
+//         cb(null, Date.now() + '-' + file.originalname); // Filename with timestamp to avoid conflicts
+//     },
+// });
+
+// const upload = multer({ storage }); // Multer instance for handling image uploads
+
+// // Add recipe with image upload functionality
+// const createRecipe = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const {
+//             title,
+//             user_id,
+//             description,
+//             ingredients, // Array
+//             instructions,
+//             preparationTime,
+//             difficulty,
+//             cuisine,
+//             mealType,
+//             image,
+//         } = req.body;
+
+//         // Handle image upload
+//         // const image = req.file ? req.file.filename : null; // Get image filename if uploaded
+
+//         // Convert ingredients array to JSON string
+//         const ingredientsJson = JSON.stringify(ingredients);
+
+//         // Insert recipe into database
+//         const [newRecipe] = await sequelize.query(
+//             `INSERT INTO Recipes (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt) 
+//           VALUES (:title, :user_id, :description, :ingredients, :instructions, :preparationTime, :difficulty, :cuisine, :mealType, :image, NOW(), NOW())`,
+//             {
+//                 replacements: {
+//                     title,
+//                     user_id,
+//                     description,
+//                     ingredients: ingredientsJson,
+//                     instructions,
+//                     preparationTime,
+//                     difficulty,
+//                     cuisine,
+//                     mealType,
+//                     image, // Store image filename in the database
+//                 },
+//                 type: QueryTypes.INSERT,
+//             }
+//         );
+
+//         // Retrieve the inserted recipe ID
+//         const [idResult] = await sequelize.query("SELECT LAST_INSERT_ID() as id", { type: QueryTypes.SELECT });
+//         const recipeId = (idResult as { id: number }).id;
+
+//         if (!recipeId) {
+//             res.status(500).json({ message: "Failed to create recipe" });
+//             return;
+//         }
+
+//         res.status(201).json({ message: "Recipe created successfully", recipeId });
+//     } catch (error) {
+//         console.error("Error creating recipe:", error);
+//         res.status(500).json({ message: "Error creating recipe", error });
+//     }
+// };
+
+// export { createRecipe, upload };
+
+
+
+
+// /**
+//  * Retrieve a specific recipe by ID
+//  */
+// const getRecipeById = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { id } = req.params;
+
+//         const [recipe] = await sequelize.query("SELECT * FROM Recipes WHERE recipe_id = :id", {
+//             replacements: { id },
+//             type: QueryTypes.SELECT,
+//         });
+
+//         if (!recipe) {
+//             res.status(404).json({ message: "Recipe not found" });
+//             return;
+//         }
+
+//         res.json(recipe);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching recipe", error });
+//     }
+// };
+
+// /**
+//  * Search recipes by title, ingredients, or tags
+//  */
+// const searchRecipes = async (req: Request, res: Response): Promise<void> => {
+//     try {
+
+//         const { query } = req.params;
+
+//         const recipes = await sequelize.query(
+//             `SELECT * FROM Recipes 
+//              WHERE title LIKE :query OR ingredients LIKE :query OR cuisine LIKE :query OR mealType LIKE :query`,
+//             {
+//                 replacements: { query: `%${query}%` },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         res.json(recipes);
+//     } catch (error) {
+//         console.log("error in fetching", error);
+//         res.status(500).json({ message: "Error searching recipes", error });
+//     }
+// };
+
+// /**
+//  * Retrieve all recipes with pagination
+//  */
+// const getAllRecipes = async (req: Request, res: Response) => {
+//     try {
+//         console.log("hii");
+
+//         // Get page and limit from query parameters, default to 1 and 10 if not provided
+//         const { page = 1, limit = 100 } = req.query;
+
+//         // Ensure page and limit are numbers
+//         const offset = (Number(page) - 1) * Number(limit);
+
+//         const recipes = await sequelize.query("SELECT * FROM Recipes LIMIT :limit OFFSET :offset", {
+//             replacements: { limit: Number(limit), offset },
+//             type: QueryTypes.SELECT,
+//         });
+
+//         // console.log("Raw Query Result:", recipes);
+//         res.json(recipes);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching recipes", error });
+//     }
+// };
+
+
+// /**
+//  * Update a recipe (only creator can update)
+//  */
+// const updateRecipe = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { id } = req.params;
+//         const { title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = req.body;
+
+//         // Check if recipe exists and get its user_id
+//         const [recipe]: any = await sequelize.query(
+//             "SELECT user_id FROM Recipes WHERE recipe_id = :id",
+//             {
+//                 replacements: { id },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!recipe) {
+//             res.status(404).json({ message: "Recipe not found" });
+//             return;
+//         }
+
+
+//         const ingredientsJSON = JSON.stringify(ingredients);
+//         // Update the recipe
+//         await sequelize.query(
+//             `UPDATE Recipes 
+//              SET title = :title, description = :description, ingredients = :ingredients, 
+//                  instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+//                  cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
+//              WHERE recipe_id = :id`,
+//             {
+//                 replacements: { id, title, description, ingredients: ingredientsJSON, instructions, preparationTime, difficulty, cuisine, mealType },
+//                 type: QueryTypes.UPDATE,
+//             }
+//         );
+
+//         res.json({ message: "Recipe updated successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error updating recipe", error });
+//     }
+// };
+
+
+// /**
+//  * Delete a recipe (only creator can delete)
+//  */
+// const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { id } = req.params;
+
+
+//         // Delete the recipe
+//         await sequelize.query("DELETE FROM Recipes WHERE recipe_id = :id", {
+//             replacements: { id },
+//             type: QueryTypes.DELETE,
+//         });
+
+//         res.json({ message: "Recipe deleted successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error deleting recipe", error });
+//     }
+// };
+
+// /**
+//  * Retrieve recipes filtered by cuisine type
+//  */
+// const getRecipesByCuisine = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { cuisine } = req.params;
+
+//         const recipes = await sequelize.query("SELECT * FROM Recipes WHERE cuisine = :cuisine", {
+//             replacements: { cuisine },
+//             type: QueryTypes.SELECT,
+//         });
+
+//         res.json(recipes);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching recipes by cuisine", error });
+//     }
+// };
+
+// /**
+//  * Retrieve recipes filtered by meal type
+//  */
+// const getRecipesByMealType = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { mealType } = req.params;
+
+//         const recipes = await sequelize.query("SELECT * FROM Recipes WHERE mealType = :mealType", {
+//             replacements: { mealType },
+//             type: QueryTypes.SELECT,
+//         });
+
+//         res.json(recipes);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching recipes by meal type", error });
+//     }
+// };
+
+// /**
+//  * Retrieve all available cuisine types
+//  */
+// const getAllCuisines = async (_req: Request, res: Response): Promise<void> => {
+//     try {
+//         const [cuisines] = await sequelize.query("SELECT DISTINCT cuisine FROM Recipes", { type: QueryTypes.SELECT });
+
+//         res.json({ cuisines });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching cuisines", error });
+//     }
+// };
+
+// /**
+//  * Retrieve all available meal types
+//  */
+
+
+// /**
+//  * Retrieve all recipes created by a specific user (by user_id)
+//  */
+// const getUserRecipes = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         console.log("hii user")
+//         const { userId } = req.params; // Get userId from query params
+//         console.log(userId)
+
+//         if (!userId) {
+//             res.status(400).json({ message: 'User ID is required.' });
+//             return;
+//         }
+
+//         const recipes = await sequelize.query(
+//             "SELECT * FROM Recipes WHERE user_id = :userId",
+//             {
+//                 replacements: { userId },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (recipes.length === 0) {
+//             res.status(404).json({ message: 'No recipes found for this user.' });
+//             return;
+//         }
+
+//         res.status(200).json(recipes);
+//     } catch (error) {
+//         console.error("Error fetching recipes by user:", error);
+//         res.status(500).json({ message: "Error fetching recipes by user.", error });
+//     }
+// };
+
+
+
+
+// const recipeController = {
+//     createRecipe: createRecipe,
+//     getRecipeById: getRecipeById,
+//     searchRecipes: searchRecipes,
+//     getAllRecipes: getAllRecipes,
+//     updateRecipe: updateRecipe,
+//     deleteRecipe: deleteRecipe,
+//     getRecipesByCuisine: getRecipesByCuisine,
+//     getRecipesByMealType: getRecipesByMealType,
+//     getAllCuisines: getAllCuisines,
+//     getUserRecipes: getUserRecipes,
+// }
+// export default recipeController;
+
+import { Request, Response } from "express";
+import recipeRepository from "../repositories/recipeRepository";
+import multer from "multer";
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, "uploads/"),
+    filename: (_req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+});
+
+const upload = multer({ storage });
+
+const createRecipe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipeId = await recipeRepository.createRecipe(req.body);
+        if (!recipeId) {
+            res.status(500).json({ message: "Failed to create recipe" });
+            return;
+        }
+        res.status(201).json({ message: "Recipe created successfully", recipeId });
+    } catch (error) {
+        res.status(500).json({ message: "Error creating recipe", error });
+    }
+};
+
+const getRecipeById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipe = await recipeRepository.findById(Number(req.params.id));
+        if (!recipe) {
+            res.status(404).json({ message: "Recipe not found" });
+            return;
+        }
+        res.json(recipe);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching recipe", error });
+    }
+};
+
+const searchRecipes = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipes = await recipeRepository.searchRecipes(req.params.query);
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ message: "Error searching recipes", error });
+    }
+};
+
+const getAllRecipes = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { page = 1, limit = 100 } = req.query;
+        const offset = (Number(page) - 1) * Number(limit);
+        const recipes = await recipeRepository.getAllRecipes(Number(limit), offset);
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching recipes", error });
+    }
+};
+
+const updateRecipe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const updated = await recipeRepository.updateRecipe(Number(req.params.id), req.body);
+        if (!updated) {
+            res.status(404).json({ message: "Recipe not found or not updated" });
+            return;
+        }
+        res.json({ message: "Recipe updated successfully" });
+    } catch (error: any) {
+        console.error("Error updating recipe:", error); // Log the error for debugging
+        res.status(500).json({ message: "Error updating recipe", error: error.message || error });
+    }
+};
+
+
+const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const deleted = await recipeRepository.deleteRecipe(Number(req.params.id));
+        if (!deleted) {
+            res.status(404).json({ message: "Recipe not found or already deleted" });
+            return;
+        }
+        res.json({ message: "Recipe deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting recipe", error });
+    }
+};
+
+const getRecipesByCuisine = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipes = await recipeRepository.getRecipesByCuisine(req.params.cuisine);
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching recipes", error });
+    }
+};
+
+const getRecipesByMealType = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipes = await recipeRepository.getRecipesByMealType(req.params.mealType);
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching recipes", error });
+    }
+};
+
+const getUserRecipes = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const recipes = await recipeRepository.getUserRecipes(Number(req.params.userId));
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching recipes", error });
+    }
+};
+
+export default { createRecipe, getRecipeById, searchRecipes, getAllRecipes, updateRecipe, deleteRecipe, getRecipesByCuisine, getRecipesByMealType, getUserRecipes, upload };
+
+
+
+================================================
+FILE: src/controllers/userController.ts
+================================================
+// import { Request, Response } from "express";
+// import bcrypt from "bcrypt";
+// import jwt from "jsonwebtoken";
+// import { sequelize } from "../config/database";
+// import { QueryTypes } from "sequelize";
+// import User from "../models/user";
+
+// const register = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { username, email, password, fullname, role } = req.body;
+
+//         const [existinguser] = (await sequelize.query(
+//             "SELECT * FROM Users WHERE email = :email",
+//             {
+//                 replacements: { email },
+//                 type: QueryTypes.SELECT,
+//             }
+//         ));
+//         if (existinguser) {
+//             res.status(400).json({ message: "User already exists" });
+//             return;
+//         }
+
+//         const hashedPassword = await bcrypt.hash(password, 10);
+
+//         const [newuser] = await sequelize.query(
+//             `INSERT INTO Users (username,email,password,fullname, role, createdAt, updatedAt)
+//         VALUES (:username, :email, :password, :fullname, :role, NOW(), NOW())`,
+//             {
+//                 replacements: {
+//                     username,
+//                     email,
+//                     password: hashedPassword,
+//                     fullname,
+//                     role,
+//                 },
+//                 type: QueryTypes.INSERT,
+//             }
+
+//         );
+//         const [idResult] = await sequelize.query("SELECT LAST_INSERT_ID() as id", {
+//             type: QueryTypes.SELECT,
+//         });
+
+//         const user_id = (idResult as { id: number }).id;
+
+//         if (!user_id) {
+//             res.status(500).json({ message: "Failed to create user" });
+//             return;
+//         }
+//         res.json({ message: "Profile created successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error in registering", error });
+//     }
+
+
+// };
+
+
+// const login = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { email, password } = req.body;
+
+//         const [user]: any[] = await sequelize.query(
+//             "SELECT user_id, username, email, password AS password_hash, fullname FROM Users WHERE email = :email",
+//             { replacements: { email }, type: QueryTypes.SELECT }
+//         );
+
+//         console.log("User fetched:", user); // Debugging
+
+//         if (!user || !user.password_hash) {
+//             res.status(400).json({ message: "Invalid credentials" });
+//             return;
+//         }
+
+//         console.log("Stored hash:", user.password_hash);
+//         console.log("Entered password:", password);
+
+//         const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+//         if (!isPasswordValid) {
+//             res.status(400).json({ message: "Invalid credentials" });
+//             return;
+//         }
+
+//         const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET || "secret", {
+//             expiresIn: "1d",
+//         });
+
+//         res.json({ user: { id: user.user_id, username: user.username, email: user.email, fullname: user.fullname }, token });
+//     } catch (error) {
+//         console.error("Login Error:", error);
+//         res.status(500).json({ message: "Error logging in", error });
+//     }
+// };
+
+
+// const getProfile = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { id } = req.params;
+
+//         const [user] = await sequelize.query(
+//             "SELECT * FROM Users WHERE user_id = :id",
+//             {
+//                 replacements: { id },
+//                 type: QueryTypes.SELECT,
+//             }
+//         );
+
+//         if (!user) {
+//             res.status(404).json({ message: "User not found" });
+//             return;
+//         }
+
+//         res.json(user);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching profile", error });
+//     }
+// };
+// const updateProfilePatch = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { username, email, password, fullname, role } = req.body;
+//         const { id } = req.params;
+
+//         // Update only the provided fields
+//         const [updatedUser] = await sequelize.query(
+//             `UPDATE Users SET username = :username, email = :email, 
+//              fullname = :fullname, role= :role, createdAt = Now(),updatedAt = NOW() WHERE user_id = :id`,
+//             {
+//                 replacements: { id, username, email, fullname, role },
+//                 type: QueryTypes.UPDATE,
+//             }
+//         );
+
+
+
+//         res.json({ message: "Profile updated successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error updating profile", error });
+//     }
+// };
+
+
+
+// // Delete User (DELETE)
+// const deleteUser = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { id } = req.params;
+
+//         const deletedUser = await sequelize.query(
+//             "DELETE FROM Users WHERE user_id = :id",
+//             {
+//                 replacements: { id },
+//                 type: QueryTypes.DELETE,
+//             }
+//         );
+
+
+
+//         res.json({ message: "User deleted successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error deleting user", error });
+//     }
+// };
+
+
+
+// export default {
+//     register,
+//     login,
+//     getProfile,
+//     updateProfilePatch,
+//     deleteUser,
+
+// };
+
+
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import userRepository from "../repositories/userRepository";
+import User from "../models/user";
+
+const register = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userExists = await userRepository.findByEmail(req.body.email);
+        if (userExists) {
+            res.status(400).json({ message: "User already exists" });
+            return;
+        }
+
+        const userId = await userRepository.create(req.body);
+        if (!userId) {
+            res.status(500).json({ message: "Failed to create user" });
+            return;
+        }
+
+        res.json({ message: "Profile created successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error in registering", error });
+    }
+};
+
+const login = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userRepository.validateCredentials(req.body.email, req.body.password);
+        if (!user) {
+            res.status(400).json({ message: "Invalid credentials" });
+            return;
+        }
+
+        const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET || "secret", { expiresIn: "1d" });
+
+        res.json({ user: { id: user.user_id, username: user.username, email: user.email, fullname: user.fullname }, token });
+    } catch (error) {
+        res.status(500).json({ message: "Error logging in", error });
+    }
+};
+
+const getProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userRepository.findById(Number(req.params.id));
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching profile", error });
+    }
+};
+
+const updateProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const success = await userRepository.update(Number(req.params.id), req.body);
+        if (!success) {
+            res.status(400).json({ message: "Failed to update profile" });
+            return;
+        }
+        res.json({ message: "Profile updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating profile", error });
+    }
+};
+
+const deleteUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const success = await userRepository.delete(Number(req.params.id));
+        if (!success) {
+            res.status(400).json({ message: "Failed to delete user" });
+            return;
+        }
+        res.json({ message: "User deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting user", error });
+    }
+};
+
+export default { register, login, getProfile, updateProfile, deleteUser };
+
+
+
+================================================
+FILE: src/middleware/authMiddleware.ts
+================================================
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+
+// Define the structure of the decoded JWT payload
+interface DecodedUser {
+    id: number;
+    email: string;
+    iat: number;
+    exp: number;
+}
+
+// Middleware to authenticate user via JWT
+export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+    try {
+        // Get the token from the Authorization header
+        const authHeader = req.header("Authorization");
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            res.status(401).json({ message: "Access denied. No token provided." });
+            return;
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as DecodedUser;
+
+        // Attach user info to the request object
+        (req as any).user = decoded;
+
+        // Proceed to the next middleware or route
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "Invalid or expired token." });
+    }
+};
+
+
+
+================================================
+FILE: src/middleware/errorHandler.ts
+================================================
+import { Request, Response, NextFunction } from "express";
+
+// Global error handler middleware
+export const errorHandler = (
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    console.error("Error:", err.message);
+
+
+    res.status(500).json({
+        message: "Something went wrong. Please try again later.",
+        error: process.env.NODE_ENV === "design" ? err.message : undefined,
+    });
+};
+
+
+
+================================================
+FILE: src/models/comment.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+import User from "./user"
+import Recipe from "./recipe"
+
+class Comment extends Model {
+    public comment_id!: string
+    public user_id!: string
+    public recipe_id!: string
+    public content!: string
+    public createdAt!: Date
+    public updatedAt!: Date
+}
+
+Comment.init(
+    {
+        comment_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        recipe_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        content: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize,
+        tableName: "Comments",
+        timestamps: true,
+    }
+)
+
+Comment.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" })
+Comment.belongsTo(Recipe, { foreignKey: "recipe_id", onDelete: "CASCADE" })
+User.hasMany(Comment, { foreignKey: "user_id", onDelete: "CASCADE" })
+Recipe.hasMany(Comment, { foreignKey: "recipe_id", onDelete: "CASCADE" })
+
+export default Comment
+
+
+
+================================================
+FILE: src/models/favorite.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+import User from "./user"
+import Recipe from "./recipe"
+
+class Favorite extends Model {
+    public fav_id!: number
+    public user_id!: number
+    public recipe_id!: number
+    public createdAt!: Date
+}
+
+Favorite.init(
+    {
+        fav_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        recipe_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize,
+        tableName: "Favorites",
+        timestamps: true,
+    }
+)
+
+Favorite.belongsTo(User, { foreignKey: "user_id" })
+Favorite.belongsTo(Recipe, { foreignKey: "recipe_id" })
+User.hasMany(Favorite, { foreignKey: "user_id" })
+Recipe.hasMany(Favorite, { foreignKey: "recipe_id" })
+
+export default Favorite
+
+
+
+================================================
+FILE: src/models/rating.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+import User from "./user"
+import Recipe from "./recipe"
+
+class Rating extends Model {
+    public rate_id!: number
+    public user_id!: number
+    public recipe_id!: number
+    public rating!: number
+    public createdAt!: Date
+    public updatedAt!: Date
+}
+
+Rating.init(
+    {
+        rate_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        recipe_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        rating: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 1,
+                max: 5,
+            },
+        },
+    },
+    {
+        sequelize,
+        tableName: "Ratings",
+        timestamps: true,
+    }
+)
+
+Rating.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" })
+Rating.belongsTo(Recipe, { foreignKey: "recipe_id", onDelete: "CASCADE" })
+User.hasMany(Rating, { foreignKey: "user_id", onDelete: "CASCADE" })
+Recipe.hasMany(Rating, { foreignKey: "recipe_id", onDelete: "CASCADE" })
+
+export default Rating
+
+
+
+================================================
+FILE: src/models/recipe.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+import User from "./user"
+
+class Recipe extends Model {
+    public recipe_id!: number
+    public user_id!: string
+    public title!: string
+    public description!: string
+    public ingredients!: object
+    public instructions!: string
+    public preparationTime!: number
+    public dfficulty!: "Easy" | "Medium" | "Hard"
+    public image!: string
+    public cuisine!: string
+    public mealType!: string
+    public createdAt!: Date
+    public updatedAt!: Date
+
+
+}
+
+Recipe.init(
+    {
+        recipe_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        description: {
+            type: DataTypes.TEXT,
+
+        },
+        ingredients: {
+            type: DataTypes.JSON,
+            allowNull: false,
+        },
+        instructions: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+
+        },
+        preparationTime: {
+            type: DataTypes.INTEGER,
+        },
+        difficulty: {
+            type: DataTypes.ENUM("Easy", "Medium", "Hard"),
+        },
+        image: {
+            type: DataTypes.STRING,
+        },
+        cuisine: {
+            type: DataTypes.STRING,
+        },
+        mealType: {
+            type: DataTypes.STRING,
+        },
+    },
+    {
+        sequelize,
+        tableName: "Recipes",
+        timestamps: true,
+    }
+
+)
+
+Recipe.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" })
+User.hasMany(Recipe, { foreignKey: "user_id", onDelete: "CASCADE" })
+
+export default Recipe
+
+
+================================================
+FILE: src/models/recipetag.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+import Recipe from "./recipe"
+import Tag from "./tag"
+
+class RecipeTag extends Model {
+    public recipetag_id!: number
+    public tag_id!: number
+}
+
+RecipeTag.init(
+    {
+        recipetag_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        tag_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize,
+        tableName: "RecipeTags",
+        timestamps: false,
+    }
+)
+
+RecipeTag.belongsTo(Recipe, { foreignKey: "recipe_id" })
+RecipeTag.belongsTo(Tag, { foreignKey: "tag_id" })
+Recipe.hasMany(RecipeTag, { foreignKey: "recipe_id" })
+Tag.hasMany(RecipeTag, { foreignKey: "tag_id" })
+
+export default RecipeTag
+
+
+
+================================================
+FILE: src/models/syncmodel.ts
+================================================
+import Recipe from "./recipe";
+
+import Tag from "./tag";
+import User from "./user";
+import Comment from "./comment";
+import Rating from "./rating";
+import Favorite from "./favorite";
+import RecipeTag from "./recipetag";
+
+
+const syncTables = async () => {
+    try {
+        await User.sync()
+        console.log("User table synced successfully")
+
+        await Tag.sync()
+        console.log("Tag table synced successfully")
+
+        await Recipe.sync({ alter: true })
+        console.log("Recipe table synced successfully")
+
+        await RecipeTag.sync()
+        console.log("Recipe table synced successfully")
+
+        await Comment.sync({ alter: true })
+        console.log("Comment table synced successfully")
+
+        await Rating.sync({ alter: true })
+        console.log("Rating table synced successfully")
+
+        await Favorite.sync()
+        console.log("Favorite table synced successfully")
+    } catch (error) {
+        console.error("Error in syncing tables:", error)
+    }
+}
+
+export default syncTables
+
+
+================================================
+FILE: src/models/tag.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+
+class Tag extends Model {
+    public itag_id!: string
+    public name!: string
+    public createdAt!: Date
+}
+
+Tag.init(
+    {
+        tag_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.STRING,
+            unique: true,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize,
+        tableName: "Tags",
+        timestamps: true,
+    }
+)
+
+export default Tag
+
+
+
+================================================
+FILE: src/models/user.ts
+================================================
+import { Model, DataTypes } from "sequelize"
+import { sequelize } from "../config/database"
+
+class User extends Model {
+    public user_id!: number
+    public username!: string
+    public email!: string
+    public password!: string
+    public fullname!: string
+    public role!: string
+
+    public createdAt!: Date
+    public updatedAt!: Date
+
+}
+
+User.init(
+    {
+        user_id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+
+        },
+        username: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        fullname: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        role: {
+            type: DataTypes.ENUM("user", "admin"),
+            defaultValue: "user",
+        },
+
+    },
+    {
+        sequelize,
+        tableName: "Users",
+        timestamps: true,
+    }
+)
+export default User
+
+
+================================================
+FILE: src/repositories/commentRepository.ts
+================================================
+import { sequelize } from "../config/database";
+import { QueryTypes } from "sequelize";
+
+interface Comment {
+    comment_id: number;
+    recipe_id: number;
+    user_id: number;
+    content: string;
+    is_deleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const CommentRepository = {
+    async addComment(recipeId: number, userId: number, content: string) {
+        await sequelize.query(
+            `INSERT INTO Comments (recipe_id, user_id, content, createdAt, updatedAt) 
+            VALUES (:recipeId, :userId, :content, NOW(), NOW())`,
+            {
+                replacements: { recipeId, userId, content },
+                type: QueryTypes.INSERT,
+            }
+        );
+    },
+
+    async getCommentsByRecipe(recipeId: number): Promise<Comment[]> {
+        const result = await sequelize.query<Comment>(
+            "SELECT * FROM Comments WHERE recipe_id = :recipeId AND is_deleted = 0",
+            {
+                replacements: { recipeId },
+                type: QueryTypes.SELECT,
+            }
+        );
+        return result;
+    },
+
+    async getCommentByIdAndUser(commentId: number, userId: number): Promise<Comment | undefined> {
+        const result = await sequelize.query<Comment>(
+            "SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId",
+            {
+                replacements: { commentId, userId },
+                type: QueryTypes.SELECT,
+            }
+        );
+        return result[0]; // Return the first result or undefined if not found
+    },
+
+    async updateComment(commentId: number, content: string) {
+        await sequelize.query(
+            "UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId",
+            {
+                replacements: { content, commentId },
+                type: QueryTypes.UPDATE,
+            }
+        );
+    },
+
+    async deleteComment(commentId: number) {
+        await sequelize.query(
+            "UPDATE Comments SET is_deleted = 1 WHERE comment_id = :commentId",
+            {
+                replacements: { commentId },
+                type: QueryTypes.UPDATE,
+            }
+        );
+    },
+};
+
+export default CommentRepository;
+
+
+
+================================================
+FILE: src/repositories/ratingRepository.ts
+================================================
+import { sequelize } from "../config/database";
+import { QueryTypes } from "sequelize";
+
+interface Rating {
+    recipe_id: number;
+    user_id: number;
+    rating: number;
+    rate_id: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const RatingRepository = {
+    async getRatingByUserAndRecipe(recipeId: number, userId: number): Promise<Rating | undefined> {
+        const result = await sequelize.query<Rating>(
+            "SELECT * FROM Ratings WHERE recipe_id = :recipeId AND user_id = :userId",
+            {
+                replacements: { recipeId, userId },
+                type: QueryTypes.SELECT,
+            }
+        );
+        return result[0]; // Return the first result or undefined if not found
+    },
+
+    async addRating(recipeId: number, userId: number, rating: number) {
+        await sequelize.query(
+            "INSERT INTO Ratings (recipe_id, user_id, rating, createdAt, updatedAt) VALUES (:recipeId, :userId, :rating, NOW(), NOW())",
+            {
+                replacements: { recipeId, userId, rating },
+                type: QueryTypes.INSERT,
+            }
+        );
+    },
+
+    async updateRating(recipeId: number, userId: number, rating: number) {
+        await sequelize.query(
+            "UPDATE Ratings SET rating = :rating, updatedAt = NOW() WHERE recipe_id = :recipeId AND user_id = :userId",
+            {
+                replacements: { recipeId, userId, rating },
+                type: QueryTypes.UPDATE,
+            }
+        );
+    },
+
+    async getAverageRating(recipeId: number): Promise<number> {
+        const result = await sequelize.query<{ avg_rating: number }>(
+            "SELECT AVG(rating) AS avg_rating FROM Ratings WHERE recipe_id = :recipeId",
+            {
+                replacements: { recipeId },
+                type: QueryTypes.SELECT,
+            }
+        );
+        return result[0]?.avg_rating ?? 0; // Return avg_rating or 0 if undefined
+    },
+
+    async deleteRating(ratingId: number) {
+        await sequelize.query(
+            "DELETE FROM Ratings WHERE rate_id = :ratingId",
+            {
+                replacements: { ratingId },
+                type: QueryTypes.DELETE,
+            }
+        );
+    },
+
+    async getRatingByIdAndUser(ratingId: number, userId: number): Promise<Rating | undefined> {
+        const result = await sequelize.query<Rating>(
+            "SELECT * FROM Ratings WHERE rate_id = :ratingId AND user_id = :userId",
+            {
+                replacements: { ratingId, userId },
+                type: QueryTypes.SELECT,
+            }
+        );
+        return result[0]; // Return the first result or undefined if not found
+    }
+};
+
+export default RatingRepository;
+
+
+
+================================================
+FILE: src/repositories/recipeRepository.ts
+================================================
+import { sequelize } from "../config/database";
+import { QueryTypes } from "sequelize";
+
+class RecipeRepository {
+    async createRecipe(recipeData: any): Promise<number | null> {
+        try {
+            const { title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image } = recipeData;
+
+            const ingredientsJson = JSON.stringify(ingredients);
+
+            await sequelize.query(
+                `INSERT INTO Recipes (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt) 
+                VALUES (:title, :user_id, :description, :ingredients, :instructions, :preparationTime, :difficulty, :cuisine, :mealType, :image, NOW(), NOW())`,
+                {
+                    replacements: {
+                        title,
+                        user_id,
+                        description,
+                        ingredients: ingredientsJson,
+                        instructions,
+                        preparationTime,
+                        difficulty,
+                        cuisine,
+                        mealType,
+                        image,
+                    },
+                    type: QueryTypes.INSERT,
+                }
+            );
+
+            const idResult: any = await sequelize.query("SELECT LAST_INSERT_ID() as id", { type: QueryTypes.SELECT });
+
+            return idResult?.[0]?.id ?? null;
+        } catch (error) {
+            console.error("Error in createRecipe:", error);
+            throw error;
+        }
+    }
+
+    async findById(id: number): Promise<any> {
+        const recipe = await sequelize.query("SELECT * FROM Recipes WHERE recipe_id = :id", {
+            replacements: { id },
+            type: QueryTypes.SELECT,
+        });
+
+        return recipe.length > 0 ? recipe[0] : null;
+    }
+
+    async searchRecipes(query: string): Promise<any[]> {
+        return await sequelize.query(
+            `SELECT * FROM Recipes 
+            WHERE title LIKE :query OR ingredients LIKE :query OR cuisine LIKE :query OR mealType LIKE :query`,
+            {
+                replacements: { query: `%${query}%` },
+                type: QueryTypes.SELECT,
+            }
+        );
+    }
+
+    async getAllRecipes(limit: number, offset: number): Promise<any[]> {
+        return await sequelize.query("SELECT * FROM Recipes LIMIT :limit OFFSET :offset", {
+            replacements: { limit, offset },
+            type: QueryTypes.SELECT,
+        });
+    }
+
+    // async updateRecipe(id: number, recipeData: any): Promise<boolean> {
+    //     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
+    //     const ingredientsJson = JSON.stringify(ingredients);
+
+    //     const result = await sequelize.query(
+    //         `UPDATE Recipes 
+    //          SET title = :title, description = :description, ingredients = :ingredients, 
+    //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+    //              cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
+    //          WHERE recipe_id = :id`,
+    //         {
+    //             replacements: { id, title, description, ingredients: ingredientsJson, instructions, preparationTime, difficulty, cuisine, mealType },
+    //             type: QueryTypes.UPDATE,
+    //         }
+    //     );
+
+    //     // Safely get the affectedRows from the result tuple
+    //     const affectedRows = Array.isArray(result) && result[0] !== undefined ? result[0] : 0;
+    //     return affectedRows > 0;
+    // }
+    async updateRecipe(id: number, recipeData: any): Promise<boolean> {
+        const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
+        const ingredientsJson = JSON.stringify(ingredients);
+
+        const result = await sequelize.query(
+            `UPDATE Recipes 
+             SET title = :title, description = :description, ingredients = :ingredients, 
+                 instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+                 cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
+             WHERE recipe_id = :id`,
+            {
+                replacements: { id, title, description, ingredients: ingredientsJson, instructions, preparationTime, difficulty, cuisine, mealType },
+                type: QueryTypes.UPDATE,
+            }
+        );
+
+        console.log("Query result:", result); // Log the result for debugging
+
+        const affectedRows = result && Array.isArray(result) && result[1] > 0 ? result[1] : 0; // Check if the affected rows is greater than 0
+        return affectedRows > 0;
+    }
+
+
+
+
+    async deleteRecipe(id: number): Promise<boolean> {
+        const result = await sequelize.query("DELETE FROM Recipes WHERE recipe_id = :id", {
+            replacements: { id },
+            type: QueryTypes.DELETE,
+        });
+
+        const affectedRows = Array.isArray(result) ? result[0] : 0;
+        return affectedRows > 0;
+    }
+
+
+    async getRecipesByCuisine(cuisine: string): Promise<any[]> {
+        return await sequelize.query("SELECT * FROM Recipes WHERE cuisine = :cuisine", {
+            replacements: { cuisine },
+            type: QueryTypes.SELECT,
+        });
+    }
+
+    async getRecipesByMealType(mealType: string): Promise<any[]> {
+        return await sequelize.query("SELECT * FROM Recipes WHERE mealType = :mealType", {
+            replacements: { mealType },
+            type: QueryTypes.SELECT,
+        });
+    }
+
+    async getUserRecipes(userId: number): Promise<any[]> {
+        return await sequelize.query("SELECT * FROM Recipes WHERE user_id = :userId", {
+            replacements: { userId },
+            type: QueryTypes.SELECT,
+        });
+    }
+}
+
+export default new RecipeRepository();
+
+
+
+================================================
+FILE: src/repositories/userRepository.ts
+================================================
+import { sequelize } from "../config/database";
+import { QueryTypes } from "sequelize";
+import bcrypt from "bcrypt";
+import User from "../models/user";
+
+class UserRepository {
+    async create(userData: Partial<User>): Promise<User | null> {
+        const { username, email, password, fullname, role } = userData;
+
+        // Hash the password if it exists
+        const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
+        const result = await sequelize.query(
+            `INSERT INTO Users (username, email, password, fullname, role, createdAt, updatedAt)
+             VALUES (:username, :email, :password, :fullname, :role, NOW(), NOW())`,
+            {
+                replacements: {
+                    username,
+                    email,
+                    password: hashedPassword,
+                    fullname,
+                    role,
+                },
+                type: QueryTypes.INSERT,
+            }
+        );
+
+        // Retrieve the last inserted ID
+        const [idResult] = await sequelize.query("SELECT LAST_INSERT_ID() as id", {
+            type: QueryTypes.SELECT,
+        });
+
+        const user_id = (idResult as { id: number }).id;
+        if (!user_id) return null;
+
+        return this.findById(user_id);
+    }
+
+    async findById(id: number): Promise<User | null> {
+        const [user]: any[] = await sequelize.query(
+            "SELECT * FROM Users WHERE user_id = :id",
+            {
+                replacements: { id },
+                type: QueryTypes.SELECT,
+            }
+        );
+
+        return user ? (user as User) : null;
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        const [user]: any[] = await sequelize.query(
+            "SELECT * FROM Users WHERE email = :email",
+            {
+                replacements: { email },
+                type: QueryTypes.SELECT,
+            }
+        );
+
+        return user ? (user as User) : null;
+    }
+
+    async validateCredentials(email: string, password: string): Promise<User | null> {
+        const user = await this.findByEmail(email);
+        if (!user || !user.password) return null;
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        return isPasswordValid ? user : null;
+    }
+
+    async update(id: number, userData: Partial<User>): Promise<boolean> {
+        const { username, email, password, fullname, role } = userData;
+
+        let hashedPassword = undefined;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        const result = await sequelize.query(
+            `UPDATE Users SET username = :username, email = :email, 
+             password = COALESCE(:password, password), fullname = :fullname, role = :role, updatedAt = NOW() 
+             WHERE user_id = :id`,
+            {
+                replacements: { id, username, email, password: hashedPassword, fullname, role },
+                type: QueryTypes.UPDATE,
+            }
+        );
+
+        const affectedRows = Array.isArray(result) ? result[1] : 0;
+        return affectedRows > 0;
+    }
+
+    async delete(id: number): Promise<boolean> {
+        const result = await sequelize.query(
+            "DELETE FROM Users WHERE user_id = :id",
+            { replacements: { id }, type: QueryTypes.DELETE }
+        );
+
+        const affectedRows = Array.isArray(result) ? result[1] : 0;
+        return affectedRows > 0;
+    }
+}
+
+export default new UserRepository();
+
+
+
+================================================
+FILE: src/routes/commentRoutes.ts
+================================================
+// import express from "express";
+// import commentController from "../controllers/commentController"; // Adjust the import path as needed
+
+// const router = express.Router();
+
+// // Route to add a comment
+// router.post("/newcomment", commentController.addComment);
+
+// // Route to get all comments for a specific recipe
+// router.get("/comments/:recipeId", commentController.getComments);
+
+// // Route to update a comment
+// router.put("/comments", commentController.updateComment);
+
+// // Route to delete a comment
+// router.delete("/comments", commentController.deleteComment);
+
+// export default router;
+
+import express from "express";
+import commentController from "../controllers/commentController"; // Adjust the import path as needed
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Comments
+ *   description: API endpoints for managing comments on recipes
+ */
+
+/**
+ * @swagger
+ * /newcomment:
+ *   post:
+ *     summary: Add a new comment to a recipe
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - recipeId
+ *               - userId
+ *               - content
+ *             properties:
+ *               recipeId:
+ *                 type: integer
+ *                 example: 1
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *               content:
+ *                 type: string
+ *                 example: "This recipe is amazing!"
+ *     responses:
+ *       201:
+ *         description: Comment added successfully
+ *       500:
+ *         description: Error adding comment
+ */
+// router.post("/newcomment", commentController.addComment);
+router.post("/recipes/:recipeId", commentController.addComment);
+
+
+/**
+ * @swagger
+ * /comments/{recipeId}:
+ *   get:
+ *     summary: Get all comments for a specific recipe
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe
+ *     responses:
+ *       200:
+ *         description: List of comments for the recipe
+ *       500:
+ *         description: Error fetching comments
+ */
+router.get("/comments/:recipeId", commentController.getComments);
+
+/**
+ * @swagger
+ * /comments:
+ *   put:
+ *     summary: Update a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commentId
+ *               - userId
+ *               - content
+ *             properties:
+ *               commentId:
+ *                 type: integer
+ *                 example: 5
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *               content:
+ *                 type: string
+ *                 example: "Updated comment text."
+ *     responses:
+ *       200:
+ *         description: Comment updated successfully
+ *       404:
+ *         description: Comment not found or unauthorized
+ *       500:
+ *         description: Error updating comment
+ */
+router.put("/comments", commentController.updateComment);
+
+/**
+ * @swagger
+ * /comments:
+ *   delete:
+ *     summary: Delete a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commentId
+ *               - userId
+ *             properties:
+ *               commentId:
+ *                 type: integer
+ *                 example: 5
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ *       404:
+ *         description: Comment not found or unauthorized
+ *       500:
+ *         description: Error deleting comment
+ */
+router.delete("/comments", commentController.deleteComment);
+
+export default router;
+
+
+
+
+================================================
+FILE: src/routes/ratingRoutes.ts
+================================================
+
+
+
+import express from "express";
+import ratingController from "../controllers/ratingController";
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /rate:
+ *   post:
+ *     summary: Add a rating for a recipe
+ *     description: Add a rating for a specific recipe by a user. If the user has already rated the recipe, it will be updated.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *               rating:
+ *                 type: integer
+ *                 description: Rating value (1-5)
+ *     responses:
+ *       201:
+ *         description: Rating added successfully
+ *       200:
+ *         description: Rating updated successfully
+ *       500:
+ *         description: Error adding or updating rating
+ */
+router.post("/rate", ratingController.addRating);
+
+/**
+ * @swagger
+ * /rate/{recipeId}:
+ *   get:
+ *     summary: Get the average rating for a recipe
+ *     description: Retrieve the average rating of a specific recipe.
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         type: integer
+ *         description: Recipe ID to get the average rating for
+ *     responses:
+ *       200:
+ *         description: Average rating retrieved successfully
+ *       500:
+ *         description: Error fetching rating
+ */
+router.get("/rate/:recipeId", ratingController.getRating);
+
+/**
+ * @swagger
+ * /rate:
+ *   put:
+ *     summary: Update a rating for a recipe
+ *     description: Update an existing rating for a specific recipe by a user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ratingId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *               rating:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Rating updated successfully
+ *       404:
+ *         description: Rating not found or unauthorized
+ *       500:
+ *         description: Error updating rating
+ */
+router.put("/rate", ratingController.updateRating);
+
+/**
+ * @swagger
+ * /rate:
+ *   delete:
+ *     summary: Delete a rating for a recipe
+ *     description: Delete a specific rating for a recipe based on the rating ID and user ID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ratingId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Rating deleted successfully
+ *       404:
+ *         description: Rating not found or unauthorized
+ *       500:
+ *         description: Error deleting rating
+ */
+router.delete("/rate", ratingController.deleteRating);
+
+export default router;
+
+
+
+
+================================================
+FILE: src/routes/recipeRoutes.ts
+================================================
+// import express from "express";
+// import recipeController, { createRecipe, upload } from "../controllers/recipeController";
+
+// const router = express.Router();
+
+// // Create a new recipe (protected route)
+// router.post('/create', upload.single('image'), createRecipe); // 'image' is the field name in the form
+
+// // Retrieve all recipes with pagination
+// router.get("/getall", recipeController.getAllRecipes);
+
+// // Retrieve a specific recipe by ID
+// router.get("/:id", recipeController.getRecipeById);
+
+// // Search recipes by title, ingredients, or tags
+// router.get("/search/:query", recipeController.searchRecipes);
+
+// // Update a specific recipe (only the creator can update)
+// router.put("/:id", recipeController.updateRecipe);
+
+// // Delete a specific recipe (only the creator can delete)
+// router.delete("/:id", recipeController.deleteRecipe);
+
+// // Retrieve recipes filtered by cuisine type
+// router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+
+// // Retrieve recipes filtered by meal type
+// router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+
+// // Retrieve a list of all available cuisine types
+// router.get("/allcuisine", recipeController.getAllCuisines);
+
+// // Retrieve user-specific recipes (using user_id)
+// router.get("/my-recipes/:userId", recipeController.getUserRecipes); // Changed route to use query param instead of route param
+
+// // router.get("/xyz/:userId", (req, res) => {
+// //     console.log("Received request for '/my-recipes' route.");
+// //     recipeController.getUserRecipes(req, res);
+// // });
+
+// export default router;
+
+
+// import express from "express";
+// import recipeController, { createRecipe, upload } from "../controllers/recipeController";
+
+// const router = express.Router();
+
+// /**
+//  * @swagger
+//  * /create:
+//  *   post:
+//  *     summary: Create a new recipe
+//  *     description: Uploads an image and creates a new recipe.
+//  *     consumes:
+//  *       - multipart/form-data
+//  *     parameters:
+//  *       - in: formData
+//  *         name: image
+//  *         type: file
+//  *         description: The image of the recipe
+//  *       - in: body
+//  *         name: recipe
+//  *         description: Recipe data
+//  *         schema:
+//  *           type: object
+//  *           required:
+//  *             - title
+//  *             - user_id
+//  *             - description
+//  *             - ingredients
+//  *             - instructions
+//  *             - preparationTime
+//  *             - difficulty
+//  *             - cuisine
+//  *             - mealType
+//  *           properties:
+//  *             title:
+//  *               type: string
+//  *             user_id:
+//  *               type: integer
+//  *             description:
+//  *               type: string
+//  *             ingredients:
+//  *               type: array
+//  *               items:
+//  *                 type: string
+//  *             instructions:
+//  *               type: string
+//  *             preparationTime:
+//  *               type: integer
+//  *             difficulty:
+//  *               type: string
+//  *             cuisine:
+//  *               type: string
+//  *             mealType:
+//  *               type: string
+//  *     responses:
+//  *       201:
+//  *         description: Recipe created successfully
+//  *       500:
+//  *         description: Error creating recipe
+//  */
+// router.post('/create', upload.single('image'), createRecipe);
+
+// /**
+//  * @swagger
+//  * /getall:
+//  *   get:
+//  *     summary: Retrieve all recipes with pagination
+//  *     parameters:
+//  *       - in: query
+//  *         name: page
+//  *         type: integer
+//  *         required: false
+//  *         description: Page number
+//  *       - in: query
+//  *         name: limit
+//  *         type: integer
+//  *         required: false
+//  *         description: Number of recipes per page
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/getall", recipeController.getAllRecipes);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   get:
+//  *     summary: Retrieve a specific recipe by ID
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe
+//  *     responses:
+//  *       200:
+//  *         description: Recipe details
+//  *       404:
+//  *         description: Recipe not found
+//  */
+// router.get("/:id", recipeController.getRecipeById);
+
+// /**
+//  * @swagger
+//  * /search/{query}:
+//  *   get:
+//  *     summary: Search recipes by title, ingredients, or tags
+//  *     parameters:
+//  *       - in: path
+//  *         name: query
+//  *         required: true
+//  *         type: string
+//  *         description: Search query
+//  *     responses:
+//  *       200:
+//  *         description: List of matching recipes
+//  */
+// router.get("/search/:query", recipeController.searchRecipes);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   put:
+//  *     summary: Update a specific recipe
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe to update
+//  *       - in: body
+//  *         name: recipe
+//  *         description: Updated recipe data
+//  *         schema:
+//  *           type: object
+//  *           properties:
+//  *             title:
+//  *               type: string
+//  *             description:
+//  *               type: string
+//  *     responses:
+//  *       200:
+//  *         description: Recipe updated successfully
+//  *       403:
+//  *         description: Unauthorized
+//  */
+// router.put("/:id", recipeController.updateRecipe);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   delete:
+//  *     summary: Delete a specific recipe
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe to delete
+//  *     responses:
+//  *       200:
+//  *         description: Recipe deleted successfully
+//  *       403:
+//  *         description: Unauthorized
+//  */
+// router.delete("/:id", recipeController.deleteRecipe);
+
+// /**
+//  * @swagger
+//  * /cuisine/{cuisine}:
+//  *   get:
+//  *     summary: Retrieve recipes filtered by cuisine type
+//  *     parameters:
+//  *       - in: path
+//  *         name: cuisine
+//  *         required: true
+//  *         type: string
+//  *         description: Cuisine type
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+
+// /**
+//  * @swagger
+//  * /mealtype/{mealType}:
+//  *   get:
+//  *     summary: Retrieve recipes filtered by meal type
+//  *     parameters:
+//  *       - in: path
+//  *         name: mealType
+//  *         required: true
+//  *         type: string
+//  *         description: Meal type
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+
+// /**
+//  * @swagger
+//  * /my-recipes/{userId}:
+//  *   get:
+//  *     summary: Retrieve user-specific recipes
+//  *     parameters:
+//  *       - in: path
+//  *         name: userId
+//  *         required: true
+//  *         type: integer
+//  *         description: User ID
+//  *     responses:
+//  *       200:
+//  *         description: List of user recipes
+//  */
+// router.get("/my-recipes/:userId", recipeController.getUserRecipes);
+
+// export default router;
+
+
+// recipeRoutes.ts
+import express from "express";
+import recipeController from "../controllers/recipeController"; // Default import
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /create:
+ *   post:
+ *     summary: Create a new recipe
+ *     description: Uploads an image and creates a new recipe.
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: image
+ *         type: file
+ *         description: The image of the recipe
+ *       - in: body
+ *         name: recipe
+ *         description: Recipe data
+ *         schema:
+ *           type: object
+ *           required:
+ *             - title
+ *             - user_id
+ *             - description
+ *             - ingredients
+ *             - instructions
+ *             - preparationTime
+ *             - difficulty
+ *             - cuisine
+ *             - mealType
+ *           properties:
+ *             title:
+ *               type: string
+ *             user_id:
+ *               type: integer
+ *             description:
+ *               type: string
+ *             ingredients:
+ *               type: array
+ *               items:
+ *                 type: string
+ *             instructions:
+ *               type: string
+ *             preparationTime:
+ *               type: integer
+ *             difficulty:
+ *               type: string
+ *             cuisine:
+ *               type: string
+ *             mealType:
+ *               type: string
+ *     responses:
+ *       201:
+ *         description: Recipe created successfully
+ *       500:
+ *         description: Error creating recipe
+ */
+router.post('/create', recipeController.upload.single('image'), recipeController.createRecipe);
+
+/**
+ * @swagger
+ * /getall:
+ *   get:
+ *     summary: Retrieve all recipes with pagination
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         type: integer
+ *         required: false
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         type: integer
+ *         required: false
+ *         description: Number of recipes per page
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get("/getall", recipeController.getAllRecipes);
+
+/**
+ * @swagger
+ * /{id}:
+ *   get:
+ *     summary: Retrieve a specific recipe by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe
+ *     responses:
+ *       200:
+ *         description: Recipe details
+ *       404:
+ *         description: Recipe not found
+ */
+router.get("/:id", recipeController.getRecipeById);
+
+/**
+ * @swagger
+ * /search/{query}:
+ *   get:
+ *     summary: Search recipes by title, ingredients, or tags
+ *     parameters:
+ *       - in: path
+ *         name: query
+ *         required: true
+ *         type: string
+ *         description: Search query
+ *     responses:
+ *       200:
+ *         description: List of matching recipes
+ */
+router.get("/search/:query", recipeController.searchRecipes);
+
+/**
+ * @swagger
+ * /{id}:
+ *   put:
+ *     summary: Update a specific recipe
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe to update
+ *       - in: body
+ *         name: recipe
+ *         description: Updated recipe data
+ *         schema:
+ *           type: object
+ *           properties:
+ *             title:
+ *               type: string
+ *             description:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Recipe updated successfully
+ *       403:
+ *         description: Unauthorized
+ */
+router.put("/:id", recipeController.updateRecipe);
+
+/**
+ * @swagger
+ * /{id}:
+ *   delete:
+ *     summary: Delete a specific recipe
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe to delete
+ *     responses:
+ *       200:
+ *         description: Recipe deleted successfully
+ *       403:
+ *         description: Unauthorized
+ */
+router.delete("/:id", recipeController.deleteRecipe);
+
+/**
+ * @swagger
+ * /cuisine/{cuisine}:
+ *   get:
+ *     summary: Retrieve recipes filtered by cuisine type
+ *     parameters:
+ *       - in: path
+ *         name: cuisine
+ *         required: true
+ *         type: string
+ *         description: Cuisine type
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+
+/**
+ * @swagger
+ * /mealtype/{mealType}:
+ *   get:
+ *     summary: Retrieve recipes filtered by meal type
+ *     parameters:
+ *       - in: path
+ *         name: mealType
+ *         required: true
+ *         type: string
+ *         description: Meal type
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+
+/**
+ * @swagger
+ * /my-recipes/{userId}:
+ *   get:
+ *     summary: Retrieve user-specific recipes
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of user recipes
+ */
+router.get("/my-recipes/:userId", recipeController.getUserRecipes);
+
+export default router;
+
+
+
+================================================
+FILE: src/routes/userRoutes.ts
+================================================
+import express from "express";
+import userController from "../controllers/userController";
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               fullname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *       400:
+ *         description: User already exists
+ */
+router.post("/register", userController.register);
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, returns token
+ *       400:
+ *         description: Invalid credentials
+ */
+router.post("/login", userController.login);
+
+/**
+ * @swagger
+ * /profile/{id}:
+ *   get:
+ *     summary: Get user profile by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *       404:
+ *         description: User not found
+ */
+router.get("/profile/:id", userController.getProfile);
+
+/**
+ * @swagger
+ * /profile/{id}:
+ *   patch:
+ *     summary: Update user profile
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               fullname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       500:
+ *         description: Error updating profile
+ */
+router.patch("/profile/:id", userController.updateProfile);
+
+/**
+ * @swagger
+ * /user/{id}:
+ *   delete:
+ *     summary: Delete a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       500:
+ *         description: Error deleting user
+ */
+router.delete("/user/:id", userController.deleteUser);
+
+export default router;
+
+
