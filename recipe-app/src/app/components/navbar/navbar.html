@@ -1,0 +1,226 @@
+<nav class="bg-white/90 shadow-xl w-full fixed top-0 left-0 z-50 backdrop-blur-md border-b border-white/20 transition-all duration-300">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <!-- Enhanced logo with animation and gradient text -->
+      <a routerLink="/" class="flex items-center space-x-2 sm:space-x-3 group">
+        <div class="relative">
+          <img src="chef-hat-svgrepo-com.svg" alt="Logo" class="h-8 w-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"/>
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+        </div>
+        <span class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-indigo-600 transition-all duration-300">Recipe Hub</span>
+      </a>
+
+      <!-- Enhanced desktop search bar with glass effect -->
+      <div class="hidden md:flex flex-1 px-8">
+        <div class="relative max-w-lg w-full">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search recipes..."
+            class="w-full rounded-2xl border-0 bg-white/80 backdrop-blur-sm pl-12 pr-4 py-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 shadow-lg hover:shadow-xl text-gray-700 placeholder-gray-500"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (focus)="showDropdown = true"
+            (blur)="onSearchBlur()"
+          />
+
+          @if (showDropdown && searchResults.length > 0) {
+            <!-- Enhanced dropdown with glass effect and animations -->
+            <div class="absolute left-0 right-0 mt-3 overflow-hidden rounded-2xl border-0 bg-white/95 backdrop-blur-md shadow-2xl search-dropdown-overlay animate-fade-in-up">
+              @for (result of searchResults; track result.recipe_id) {
+                <a
+                  [routerLink]="['/recipe', result.recipe_id]"
+                  class="flex items-center space-x-4 p-4 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 cursor-pointer transition-all duration-300 border-b border-gray-100 last:border-b-0 group"
+                  (click)="closeDropdown()"
+                >
+                  <img
+                    [src]="result.image || 'placeholder.svg'"
+                    [alt]="result.title"
+                    class="h-12 w-12 sm:h-16 sm:w-16 rounded-xl object-cover shadow-md group-hover:shadow-lg transition-shadow duration-300"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors duration-300">{{ result.title }}</h3>
+                    <p class="text-sm text-gray-500 truncate">{{ result.description }}</p>
+                    <p class="text-xs text-indigo-600 font-medium">{{ result.cuisine }} • {{ result.preparationTime }} mins</p>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Enhanced desktop actions with improved buttons -->
+      <div class="hidden md:flex items-center space-x-4">
+        @if (currentUser()) {
+          <!-- Enhanced Create Recipe Button -->
+          <button
+            (click)="openCreateRecipeModal()"
+            class="inline-flex items-center justify-center space-x-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:from-green-600 hover:to-emerald-700 hover:scale-105 hover:shadow-xl shadow-lg group"
+          >
+            <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span class="hidden sm:inline">Create Recipe</span>
+          </button>
+
+          <!-- Enhanced User Dropdown -->
+          <div class="relative">
+            <button (click)="toggleDropdown()" class="flex items-center space-x-2 rounded-2xl bg-white/80 backdrop-blur-sm px-4 sm:px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-white hover:shadow-lg transition-all duration-300 border border-gray-200 group">
+              <span class="hidden sm:inline group-hover:text-indigo-600 transition-colors duration-300">{{ username() }}</span>
+              <svg class="w-4 h-4 group-hover:text-indigo-600 transition-all duration-300" [class.rotate-180]="isDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            @if (isDropdownOpen) {
+              <!-- Enhanced user dropdown with glass effect -->
+              <div class="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border-0 bg-white/95 backdrop-blur-md shadow-2xl z-50 animate-fade-in-up">
+                <a (click)="navigateToMyRecipes()" class="cursor-pointer flex items-center space-x-3 px-6 py-4 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600 transition-all duration-300 group">
+                  <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span class="font-medium">My Recipes</span>
+                </a>
+                <button (click)="logout()" class="flex w-full items-center space-x-3 px-6 py-4 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-300 group">
+                  <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  <span class="font-medium">Logout</span>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Enhanced login button -->
+          <a routerLink="/login" class="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 hover:scale-105 hover:shadow-xl shadow-lg">
+            Login
+          </a>
+        }
+      </div>
+
+      <!-- Enhanced mobile menu button -->
+      <div class="md:hidden">
+        <button
+          (click)="toggleMobileMenu()"
+          class="mobile-menu-button inline-flex items-center justify-center p-3 rounded-2xl text-gray-700 hover:text-indigo-600 hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-300 backdrop-blur-sm"
+        >
+          <svg class="block h-6 w-6 transition-transform duration-300" [class.rotate-90]="isMobileMenuOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Enhanced Mobile Menu with glass effect -->
+    <div class="md:hidden mobile-menu" [class.hidden]="!isMobileMenuOpen">
+      <div class="px-4 pt-4 pb-6 space-y-3 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl rounded-b-2xl mx-4">
+        <!-- Enhanced Mobile Search -->
+        <div class="px-2 py-3 mobile-search">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search recipes..."
+              class="w-full rounded-2xl border-0 bg-gray-50 pl-12 pr-4 py-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all duration-300 shadow-md"
+              [(ngModel)]="searchQuery"
+              (input)="onSearchInput()"
+              (focus)="showDropdown = true"
+              (blur)="onSearchBlur()"
+            />
+
+            @if (showDropdown && searchResults.length > 0) {
+              <div class="absolute left-0 right-0 mt-2 overflow-hidden rounded-2xl border-0 bg-white shadow-2xl search-dropdown-overlay max-h-60 overflow-y-auto">
+                @for (result of searchResults; track result.recipe_id) {
+                  <a
+                    [routerLink]="['/recipe', result.recipe_id]"
+                    class="flex items-center space-x-3 p-4 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-all duration-300"
+                    (click)="closeDropdown(); closeMobileMenu()"
+                  >
+                    <img
+                      [src]="result.image || 'placeholder.svg'"
+                      [alt]="result.title"
+                      class="h-12 w-12 rounded-xl object-cover flex-shrink-0 shadow-md"
+                    />
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-semibold text-gray-900 text-sm truncate">{{ result.title }}</h3>
+                      <p class="text-xs text-gray-500 truncate">{{ result.description }}</p>
+                      <p class="text-xs text-indigo-600 font-medium">{{ result.cuisine }} • {{ result.preparationTime }} mins</p>
+                    </div>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (currentUser()) {
+          <!-- Enhanced Mobile Create Recipe Button -->
+          <button
+            (click)="openCreateRecipeModal(); closeMobileMenu()"
+            class="flex items-center space-x-3 w-full px-4 py-3 text-base font-semibold text-gray-700 hover:text-indigo-600 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 rounded-2xl transition-all duration-300"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span>Create Recipe</span>
+          </button>
+
+          <!-- Enhanced Mobile User Menu -->
+          <div class="border-t border-gray-200 pt-3 mt-3">
+            <div class="px-4 py-2 text-sm font-semibold text-indigo-600 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl">
+              {{ username() }}
+            </div>
+            <a
+              (click)="navigateToMyRecipes(); closeMobileMenu()"
+              class="flex items-center space-x-3 px-4 py-3 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 rounded-2xl cursor-pointer transition-all duration-300 mt-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>My Recipes</span>
+            </a>
+            <button
+              (click)="logout(); closeMobileMenu()"
+              class="flex items-center space-x-3 w-full px-4 py-3 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-2xl transition-all duration-300 mt-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        } @else {
+          <a
+            routerLink="/login"
+            (click)="closeMobileMenu()"
+            class="flex items-center space-x-3 px-4 py-3 text-base font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 rounded-2xl transition-all duration-300"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span>Login</span>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+
+  
+</nav>
+
+<!-- Create Recipe Modal -->
+  <app-create-recipe-modal
+    [isOpen]="isCreateRecipeModalOpen"
+    (close)="closeCreateRecipeModal()"
+    (success)="onRecipeCreated($event)"
+  ></app-create-recipe-modal>

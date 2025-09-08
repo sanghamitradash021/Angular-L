@@ -1,0 +1,138 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-pink-50 to-rose-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Added animated background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-200/30 to-orange-200/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+
+  <div class="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-white/20 relative z-10 animate-fade-in-up">
+    <div class="text-center">
+      <!-- Enhanced title with gradient text -->
+      <h2 class="mt-6 text-4xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
+        Join Our Culinary Community
+      </h2>
+      <div class="w-16 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto rounded-full mb-4"></div>
+      <p class="text-gray-600 font-medium">
+        Create your account and start sharing recipes
+      </p>
+    </div>
+    
+    @if (error) {
+      <!-- Enhanced error styling -->
+      <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-xl shadow-md animate-fade-in" role="alert">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p class="font-semibold">{{ error }}</p>
+        </div>
+      </div>
+    }
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <!-- Enhanced form fields with floating labels and better styling -->
+      <div class="space-y-4">
+        <div class="relative">
+          <input formControlName="fullname" id="fullname" type="text" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Full Name">
+          <label for="fullname" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Full Name
+          </label>
+        </div>
+
+        <div class="relative">
+          <input formControlName="username" id="username" type="text" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Username">
+          <label for="username" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Username
+          </label>
+        </div>
+
+        <div class="relative">
+          <input formControlName="email" id="email" type="email" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Email">
+          <label for="email" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Email Address
+          </label>
+        </div>
+
+        <div class="relative">
+          <input formControlName="password" id="password" type="password" required
+            class="peer w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 placeholder-transparent shadow-lg hover:shadow-xl"
+            placeholder="Password">
+          <label for="password" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-600">
+            Password
+          </label>
+        </div>
+
+        <div class="relative">
+          <select formControlName="role" id="role"
+            class="w-full px-4 py-4 bg-white/80 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <label for="role" class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-orange-600">
+            Role
+          </label>
+        </div>
+      </div>
+      
+      <!-- Enhanced button with gradient and animations -->
+      <button type="submit" [disabled]="signupForm.invalid || loading" 
+        class="group relative w-full flex justify-center items-center py-4 px-6 border border-transparent text-sm font-semibold rounded-2xl text-white bg-gradient-to-r from-orange-600 to-pink-600 hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5">
+        @if (loading) {
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Signing up...
+        } @else {
+          <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          Sign up
+        }
+      </button>
+    </form>
+    
+    <div class="text-center">
+      <!-- Enhanced link styling -->
+      <a routerLink="/login" class="font-medium text-orange-600 hover:text-pink-600 transition-colors duration-300 hover:underline">
+        Already have an account? <span class="font-semibold">Log in</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+</style>

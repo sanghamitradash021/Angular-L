@@ -1,0 +1,55 @@
+/* Mobile menu animations */
+.mobile-menu {
+  transition: all 0.3s ease-in-out;
+}
+
+.mobile-menu.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.mobile-menu:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ensure proper z-index for mobile menu */
+.mobile-menu {
+  z-index: 40;
+}
+
+/* Smooth transitions for mobile menu button */
+.mobile-menu-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.mobile-menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile search input focus styles */
+@media (max-width: 768px) {
+  .mobile-search input:focus {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  /* Mobile search dropdown positioning */
+  .mobile-search .absolute {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Much higher z-index for mobile dropdown to appear above page content */
+  }
+
+  /* Ensure mobile search dropdown appears above other mobile menu items */
+  .mobile-menu .mobile-search {
+    position: relative;
+    z-index: 50;
+  }
+}
+
+/* Search dropdown z-index fix for both desktop and mobile */
+.search-dropdown-overlay {
+  z-index: 1000; /* High z-index to appear above all page content */
+}
