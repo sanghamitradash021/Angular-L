@@ -6,17 +6,15 @@
   </div>
   
   <div class="relative z-10 max-w-7xl mx-auto">
-    <!-- Enhanced header with animation -->
-    <div class="text-center mb-12 animate-fade-in-up">
-      <h2 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
-        My Culinary Creations
-      </h2>
-      <div class="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto rounded-full"></div>
-    </div>
-
-    <!-- Enhanced Sorting Controls -->
-    @if (myRecipes.length > 0) {
-      <div class="flex justify-end mb-12 animate-fade-in-up" style="animation-delay: 0.2s;">
+    <!-- Enhanced header with sorting controls -->
+    <div class="flex justify-between items-center mb-12 animate-fade-in-up">
+      <div>
+        <h2 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
+          My Culinary Creations
+        </h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full"></div>
+      </div>
+      @if (myRecipes.length > 0) {
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105">
           <label for="sort-select" class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
             <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,8 +34,8 @@
             <option value="difficulty">⚡ Difficulty</option>
           </select>
         </div>
-      </div>
-    }
+      }
+    </div>
 
     @if (loading) {
       <!-- Enhanced loading state -->
@@ -147,12 +145,20 @@
   </div>
 </div>
 
-<app-edit-recipe-modal 
+<app-edit-recipe-modal
   [isOpen]="isEditModalOpen"
-  [recipe]="selectedRecipe" 
-  (close)="isEditModalOpen = false" 
-  (success)="onRecipeUpdated($event)">
+  [recipe]="selectedRecipe"
+  (close)="onEditModalClose()"
+  >
 </app-edit-recipe-modal>
+
+<app-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen"
+  [recipeTitle]="recipeToDelete?.title || ''"
+  [isDeleting]="isDeleting"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()">
+</app-delete-confirmation-modal>
 
 <style>
 @keyframes fade-in-up {

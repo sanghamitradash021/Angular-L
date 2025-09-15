@@ -101,6 +101,7 @@ import { RecipeService } from '../../service/recipe-service';
 import { AuthService } from '../../service/auth-service'; // Fix import path
 import { Recipe, Comment } from '../../models/interface/recipe.interface'; // Fix imports
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -123,7 +124,8 @@ export class RecipeDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private recipeService: RecipeService,
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private logger: NGXLogger
   ) {
     this.currentUser = this.authService.currentUser;
     this.isOwner = computed(() => this.currentUser()?.id === this.recipe?.user_id);
@@ -137,14 +139,14 @@ export class RecipeDetailComponent implements OnInit {
     if (recipeId) {
       this.recipeService.getRecipeById(recipeId).subscribe({
         next: (recipe) => {
-          console.log('Recipe received:', recipe); // Debug log
+          this.logger.debug('Recipe received:', recipe);
           this.recipe = recipe;
           this.loading = false;
           this.loadComments(recipeId);
           this.loadUserRating(recipeId);
         },
         error: (err) => {
-          console.error('Error loading recipe:', err); // Debug log
+          this.logger.error('Error loading recipe:', err);
           this.error = 'Failed to load recipe.';
           this.loading = false;
         }
@@ -168,7 +170,7 @@ export class RecipeDetailComponent implements OnInit {
       }
       return [];
     } catch (error) {
-      console.error('Error parsing ingredients:', error);
+      this.logger.error('Error parsing ingredients:', error);
       return [];
     }
   }
@@ -189,36 +191,37 @@ export class RecipeDetailComponent implements OnInit {
   loadComments(recipeId: string) {
     this.recipeService.getComments(recipeId).subscribe({
       next: (comments) => this.comments = comments,
-      error: (err) => console.error('Error loading comments:', err)
+      error: (err) => this.logger.error('Error loading comments:', err)
     });
   }
 
-  addComment() {
-    const content = this.commentForm.value.content;
-    const userId = this.authService.getUserId();
-    const recipeId = this.recipe?.recipe_id.toString();
+ addComment() {
+  const content = this.commentForm.value.content;
+  const userId = this.authService.getUserId();
+  const recipeId = this.recipe?.recipe_id.toString();
 
-    if (content && userId && recipeId) {
-      this.recipeService.addComment(recipeId, content, userId).subscribe({
-        next: (newComment) => {
-          this.comments.unshift(newComment); // Add to beginning so it appears at top
-          this.commentForm.reset();
-        },
-        error: (err) => console.error('Error adding comment:', err)
-      });
-    }
+  // FIX: Trim the content before checking its value
+  if (content && content.trim() && userId && recipeId) { 
+    this.recipeService.addComment(recipeId, content, userId).subscribe({
+      next: (newComment) => {
+        this.comments.unshift(newComment);
+        this.commentForm.reset();
+      },
+      error: (err) => this.logger.error('Error adding comment:', err)
+    });
   }
+}
 
  addRating(rating: number) {
   const userId = this.authService.getUserId();
   const recipeId = this.recipe?.recipe_id.toString();
 
-  console.log('Adding rating:', { recipeId, userId, rating }); // Debug log
+  this.logger.debug('Adding rating:', { recipeId, userId, rating });
 
   if (userId && recipeId) {
     this.recipeService.addRating(recipeId, rating, userId).subscribe({
       next: (response) => {
-        console.log('Rating added successfully:', response);
+        this.logger.debug('Rating added successfully:', response);
         // Update the recipe's userRating to reflect the change in UI
         if (this.recipe) {
           this.recipe.userRating = rating;
@@ -227,7 +230,7 @@ export class RecipeDetailComponent implements OnInit {
         this.loadAverageRating();
       },
       error: (err) => {
-        console.error('Error adding rating:', err);
+        this.logger.error('Error adding rating:', err);
         alert('Failed to add rating. Please try again.');
       }
     });
@@ -241,11 +244,11 @@ loadAverageRating() {
   if (this.recipe) {
     this.recipeService.getAverageRating(this.recipe.recipe_id.toString()).subscribe({
       next: (response) => {
-        console.log('Average rating:', response.averageRating);
+        this.logger.debug('Average rating:', response.averageRating);
         // Update UI with average rating
       },
       error: (err) => {
-        console.error('Error loading average rating:', err);
+        this.logger.error('Error loading average rating:', err);
       }
     });
   }
@@ -257,13 +260,13 @@ loadUserRating(recipeId: string) {
   if (userId) {
     this.recipeService.getUserRating(recipeId, userId).subscribe({
       next: (response) => {
-        console.log('User rating loaded:', response.userRating);
+        this.logger.debug('User rating loaded:', response.userRating);
         if (this.recipe) {
           this.recipe.userRating = response.userRating;
         }
       },
       error: (err) => {
-        console.error('Error loading user rating:', err);
+        this.logger.error('Error loading user rating:', err);
       }
     });
   }

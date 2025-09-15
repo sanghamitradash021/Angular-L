@@ -111,7 +111,7 @@
 // }
 
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -123,12 +123,14 @@ import { RecipeService } from '../../service/recipe-service';
 import { AuthService } from '../../service/auth-service';
 import { CloudinaryService } from '../../service/cloudinary.service';
 import { Recipe } from '../../models/interface/recipe.interface';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-create-recipe-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-recipe-modal.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateRecipeModalComponent {
   @Input() isOpen = false;
@@ -143,7 +145,8 @@ export class CreateRecipeModalComponent {
     private fb: FormBuilder,
     private recipeService: RecipeService,
     private authService: AuthService,
-     private cloudinaryService: CloudinaryService
+     private cloudinaryService: CloudinaryService,
+     private logger: NGXLogger
   ) {
     this.recipeForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -177,15 +180,15 @@ export class CreateRecipeModalComponent {
 
   // Add this method to see form status
   logFormStatus() {
-    console.log('Form valid:', this.recipeForm.valid);
-    console.log('Form errors:', this.recipeForm.errors);
-    console.log('Form values:', this.recipeForm.value);
-    
+    this.logger.debug('Form valid:', this.recipeForm.valid);
+    this.logger.debug('Form errors:', this.recipeForm.errors);
+    this.logger.debug('Form values:', this.recipeForm.value);
+
     // Check each field
     Object.keys(this.recipeForm.controls).forEach(key => {
       const field = this.recipeForm.get(key);
       if (field && field.invalid) {
-        console.log(`${key} errors:`, field.errors);
+        this.logger.debug(`${key} errors:`, field.errors);
       }
     });
   }
@@ -203,9 +206,9 @@ export class CreateRecipeModalComponent {
 
   onImageChange(event: any) {
     const file = event.target.files[0];
-    console.log('Selected file:', file);
+    this.logger.debug('Selected file:', file);
     if (file) {
-      console.log('File details:', {
+      this.logger.debug('File details:', {
       name: file.name,
       size: file.size,
       type: file.type
@@ -214,7 +217,7 @@ export class CreateRecipeModalComponent {
         image: file
       });
     }
-    console.log('Form value after image:', this.recipeForm.get('image')?.value);
+    this.logger.debug('Form value after image:', this.recipeForm.get('image')?.value);
   }
 
   private resetForm() {
@@ -251,15 +254,15 @@ export class CreateRecipeModalComponent {
   const formData = { ...this.recipeForm.value, user_id: userId };
 
   if (formData.image && formData.image instanceof File) {
-    console.log('Uploading image to Cloudinary...');
+    this.logger.log('Uploading image to Cloudinary...');
     this.cloudinaryService.uploadImage(formData.image).subscribe({
       next: (imageUrl) => {
-        console.log('Image uploaded to Cloudinary:', imageUrl);
+        this.logger.log('Image uploaded to Cloudinary:', imageUrl);
         formData.image = imageUrl; // Replace file with Cloudinary URL
         this.createRecipeWithData(formData);
       },
       error: (err) => {
-        console.error('Cloudinary upload failed:', err);
+        this.logger.error('Cloudinary upload failed:', err);
         this.error = 'Failed to upload image. Please try again.';
         this.loading = false;
       }
@@ -272,7 +275,7 @@ export class CreateRecipeModalComponent {
 private createRecipeWithData(formData: any) {
   this.recipeService.createRecipe(formData).subscribe({
     next: (response) => {
-      console.log('Recipe created successfully:', response);
+      this.logger.log('Recipe created successfully:', response);
       this.loading = false;
       // Emit the actual recipe object from the response
       if (response && response.recipe) {
@@ -300,24 +303,24 @@ private createRecipeWithData(formData: any) {
       this.onClose();
     },
     error: (err) => {
-      console.error('Recipe creation error:', err);
+      this.logger.error('Recipe creation error:', err);
       this.loading = false;
       this.error = 'Failed to create recipe. Please try again.';
     },
   });
 }
-  // console.log('Submitting recipe:', formData);
+  // this.logger.log('Submitting recipe:', formData);
 
   // Use the actual service call instead of setTimeout
   // this.recipeService.createRecipe(formData).subscribe({
   //   next: (response) => {
-  //     console.log('Recipe created successfully:', response);
+  //     this.logger.log('Recipe created successfully:', response);
   //     this.loading = false;
   //     this.success.emit();
   //     this.onClose();
   //   },
   //   error: (err) => {
-  //     console.error('Recipe creation error:', err);
+  //     this.logger.error('Recipe creation error:', err);
   //     this.loading = false;
   //     this.error = 'Failed to create recipe. Please try again.';
   //   },

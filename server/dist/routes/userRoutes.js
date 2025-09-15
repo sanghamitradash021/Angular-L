@@ -35,7 +35,7 @@ const router = express_1.default.Router();
  *       400:
  *         description: User already exists
  */
-router.post("/register", userController_1.default.register);
+router.post('/register', userController_1.default.register);
 /**
  * @swagger
  * /login:
@@ -59,7 +59,7 @@ router.post("/register", userController_1.default.register);
  *       400:
  *         description: Invalid credentials
  */
-router.post("/login", userController_1.default.login);
+router.post('/login', userController_1.default.login);
 /**
  * @swagger
  * /profile/{id}:
@@ -78,7 +78,7 @@ router.post("/login", userController_1.default.login);
  *       404:
  *         description: User not found
  */
-router.get("/profile/:id", userController_1.default.getProfile);
+router.get('/profile/:id', userController_1.default.getProfile);
 /**
  * @swagger
  * /profile/{id}:
@@ -112,7 +112,7 @@ router.get("/profile/:id", userController_1.default.getProfile);
  *       500:
  *         description: Error updating profile
  */
-router.patch("/profile/:id", userController_1.default.updateProfile);
+router.patch('/profile/:id', userController_1.default.updateProfile);
 /**
  * @swagger
  * /user/{id}:
@@ -131,5 +131,5 @@ router.patch("/profile/:id", userController_1.default.updateProfile);
  *       500:
  *         description: Error deleting user
  */
-router.delete("/user/:id", userController_1.default.deleteUser);
+router.delete('/user/:id', userController_1.default.deleteUser);
 exports.default = router;

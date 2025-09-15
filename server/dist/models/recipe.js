@@ -29,7 +29,7 @@ Recipe.init({
     },
     user_id: {
         type: sequelize_1.DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
     title: {
         type: sequelize_1.DataTypes.STRING,
@@ -50,7 +50,7 @@ Recipe.init({
         type: sequelize_1.DataTypes.INTEGER,
     },
     difficulty: {
-        type: sequelize_1.DataTypes.ENUM("Easy", "Medium", "Hard"),
+        type: sequelize_1.DataTypes.ENUM('Easy', 'Medium', 'Hard'),
     },
     image: {
         type: sequelize_1.DataTypes.STRING,
@@ -63,9 +63,17 @@ Recipe.init({
     },
 }, {
     sequelize: database_1.sequelize,
-    tableName: "Recipes",
+    tableName: 'Recipes',
     timestamps: true,
+    indexes: [
+        {
+            fields: ['cuisine']
+        },
+        {
+            fields: ['mealType']
+        }
+    ]
 });
-Recipe.belongsTo(user_1.default, { foreignKey: "user_id", onDelete: "CASCADE" });
-user_1.default.hasMany(Recipe, { foreignKey: "user_id", onDelete: "CASCADE" });
+Recipe.belongsTo(user_1.default, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+user_1.default.hasMany(Recipe, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 exports.default = Recipe;

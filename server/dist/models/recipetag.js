@@ -22,11 +22,11 @@ RecipeTag.init({
     },
 }, {
     sequelize: database_1.sequelize,
-    tableName: "RecipeTags",
+    tableName: 'RecipeTags',
     timestamps: false,
 });
-RecipeTag.belongsTo(recipe_1.default, { foreignKey: "recipe_id" });
-RecipeTag.belongsTo(tag_1.default, { foreignKey: "tag_id" });
-recipe_1.default.hasMany(RecipeTag, { foreignKey: "recipe_id" });
-tag_1.default.hasMany(RecipeTag, { foreignKey: "tag_id" });
+RecipeTag.belongsTo(recipe_1.default, { foreignKey: 'recipe_id' });
+RecipeTag.belongsTo(tag_1.default, { foreignKey: 'tag_id' });
+recipe_1.default.hasMany(RecipeTag, { foreignKey: 'recipe_id' });
+tag_1.default.hasMany(RecipeTag, { foreignKey: 'tag_id' });
 exports.default = RecipeTag;

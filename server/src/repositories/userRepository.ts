@@ -3,6 +3,8 @@ import { QueryTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 
+/* Define the User interface to represent the structure of a user record */
+
 class UserRepository {
   async create(userData: Partial<User>): Promise<User | null> {
     const { username, email, password, fullname, role } = userData;
@@ -35,6 +37,8 @@ class UserRepository {
 
     return this.findById(user_id);
   }
+
+  /* Retrieve a user by their ID */
 
   async findById(id: number): Promise<User | null> {
     const [user]: any[] = await sequelize.query('SELECT * FROM Users WHERE user_id = :id', {

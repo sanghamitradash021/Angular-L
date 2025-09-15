@@ -34,7 +34,7 @@ const router = express_1.default.Router();
  *       500:
  *         description: Error adding or updating rating
  */
-router.post("/rate", ratingController_1.default.addRating);
+router.post('/rate', ratingController_1.default.addRating);
 /**
  * @swagger
  * /rate/{recipeId}:
@@ -53,7 +53,7 @@ router.post("/rate", ratingController_1.default.addRating);
  *       500:
  *         description: Error fetching rating
  */
-router.get("/rate/:recipeId", ratingController_1.default.getRating);
+router.get('/rate/:recipeId', ratingController_1.default.getRating);
 /**
  * @swagger
  * /rate/user/{recipeId}/{userId}:
@@ -79,7 +79,7 @@ router.get("/rate/:recipeId", ratingController_1.default.getRating);
  *       500:
  *         description: Error fetching user rating
  */
-router.get("/rate/user/:recipeId/:userId", ratingController_1.default.getUserRating);
+router.get('/rate/user/:recipeId/:userId', ratingController_1.default.getUserRating);
 /**
  * @swagger
  * /rate/user/{recipeId}/{userId}:
@@ -105,7 +105,7 @@ router.get("/rate/user/:recipeId/:userId", ratingController_1.default.getUserRat
  *       500:
  *         description: Error fetching rating
  */
-router.get("/rate/user/:recipeId/:userId", ratingController_1.default.getUserRating);
+router.get('/rate/user/:recipeId/:userId', ratingController_1.default.getUserRating);
 /**
  * @swagger
  * /rate:
@@ -133,7 +133,7 @@ router.get("/rate/user/:recipeId/:userId", ratingController_1.default.getUserRat
  *       500:
  *         description: Error updating rating
  */
-router.put("/rate", ratingController_1.default.updateRating);
+router.put('/rate', ratingController_1.default.updateRating);
 /**
  * @swagger
  * /rate:
@@ -159,5 +159,5 @@ router.put("/rate", ratingController_1.default.updateRating);
  *       500:
  *         description: Error deleting rating
  */
-router.delete("/rate", ratingController_1.default.deleteRating);
+router.delete('/rate', ratingController_1.default.deleteRating);
 exports.default = router;

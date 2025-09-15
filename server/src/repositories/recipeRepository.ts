@@ -2,6 +2,8 @@ import { sequelize } from '../config/database';
 import { QueryTypes } from 'sequelize';
 import Recipe from '../models/recipe';
 
+/* Define the Recipe interface to represent the structure of a recipe record */
+
 class RecipeRepository {
   async createRecipe(recipeData: any): Promise<number | null> {
     try {
@@ -58,6 +60,8 @@ class RecipeRepository {
     }
   }
 
+  /* Retrieve a recipe by its ID */
+
   async findById(id: number): Promise<any> {
     const recipe = await sequelize.query('SELECT * FROM Recipes WHERE recipe_id = :id', {
       replacements: { id },
@@ -66,6 +70,8 @@ class RecipeRepository {
 
     return recipe.length > 0 ? recipe[0] : null;
   }
+
+  /* Search for recipes based on a query string */
 
   async searchRecipes(query: string): Promise<any[]> {
     return await sequelize.query(
@@ -77,6 +83,8 @@ class RecipeRepository {
       },
     );
   }
+
+  /* Retrieve all recipes with pagination */
 
   async getAllRecipes(limit: number, offset: number): Promise<any[]> {
     return await sequelize.query('SELECT * FROM Recipes LIMIT :limit OFFSET :offset', {
@@ -128,6 +136,8 @@ class RecipeRepository {
   //     return affectedRows > 0;
   // }
 
+  /* Update an existing recipe and return the updated record */
+
   async updateRecipe(id: number, recipeData: any): Promise<Recipe | null> {
     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image } =
       recipeData;
@@ -171,6 +181,8 @@ class RecipeRepository {
   //     return affectedRows > 0;
   // }
 
+  /* Delete a recipe by its ID */
+
   async deleteRecipe(id: number): Promise<boolean> {
     try {
       console.log('Repository: Deleting recipe with ID:', id);
@@ -189,6 +201,8 @@ class RecipeRepository {
     }
   }
 
+  /* Retrieve recipes by cuisine type */
+
   async getRecipesByCuisine(cuisine: string): Promise<any[]> {
     return await sequelize.query('SELECT * FROM Recipes WHERE cuisine = :cuisine', {
       replacements: { cuisine },
@@ -196,12 +210,16 @@ class RecipeRepository {
     });
   }
 
+  /* Retrieve recipes by meal type */
+
   async getRecipesByMealType(mealType: string): Promise<any[]> {
     return await sequelize.query('SELECT * FROM Recipes WHERE mealType = :mealType', {
       replacements: { mealType },
       type: QueryTypes.SELECT,
     });
   }
+
+  /* Retrieve all recipes created by a specific user */
 
   async getUserRecipes(userId: number): Promise<any[]> {
     return await sequelize.query('SELECT * FROM Recipes WHERE user_id = :userId', {

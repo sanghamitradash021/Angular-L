@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../config/database");
 const sequelize_1 = require("sequelize");
+// Define the type for the result of an INSERT query
 const CommentRepository = {
     async addComment(recipeId, userId, content) {
         // Insert the comment and get the inserted ID
@@ -19,6 +20,7 @@ const CommentRepository = {
         });
         return newComment;
     },
+    /* Retrieve all comments for a specific recipe, including the username of the commenter */
     async getCommentsByRecipe(recipeId) {
         const result = await database_1.sequelize.query(`SELECT c.comment_id, c.recipe_id, c.user_id, c.content, c.createdAt, c.updatedAt, u.username
              FROM Comments c
@@ -30,21 +32,24 @@ const CommentRepository = {
         });
         return result;
     },
+    /* Retrieve a specific comment by its ID and user ID to ensure ownership before updating or deleting */
     async getCommentByIdAndUser(commentId, userId) {
-        const result = await database_1.sequelize.query("SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId", {
+        const result = await database_1.sequelize.query('SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId', {
             replacements: { commentId, userId },
             type: sequelize_1.QueryTypes.SELECT,
         });
         return result[0]; // Return the first result or undefined if not found
     },
+    /* Update a comment's content */
     async updateComment(commentId, content) {
-        await database_1.sequelize.query("UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId", {
+        await database_1.sequelize.query('UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId', {
             replacements: { content, commentId },
             type: sequelize_1.QueryTypes.UPDATE,
         });
     },
+    /* Delete a comment by its ID */
     async deleteComment(commentId) {
-        await database_1.sequelize.query("DELETE FROM Comments WHERE comment_id = :commentId", {
+        await database_1.sequelize.query('DELETE FROM Comments WHERE comment_id = :commentId', {
             replacements: { commentId },
             type: sequelize_1.QueryTypes.DELETE,
         });
