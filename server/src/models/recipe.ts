@@ -64,6 +64,14 @@ Recipe.init(
     sequelize,
     tableName: 'Recipes',
     timestamps: true,
+    indexes: [ 
+      {
+        fields: ['cuisine']
+      },
+      {
+        fields: ['mealType']
+      }
+    ]
   },
 );
 

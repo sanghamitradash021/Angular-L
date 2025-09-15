@@ -53,7 +53,7 @@ const specs = (0, swagger_jsdoc_1.default)(options);
 const swaggerDocs = (app, port) => {
     app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(specs, {
         customCss: '.swagger-ui .topbar { display: none }',
-        customSiteTitle: "API Documentation",
+        customSiteTitle: 'API Documentation',
     }));
     app.get('/docs.json', (req, res) => {
         res.setHeader('Content-Type', 'application/json');

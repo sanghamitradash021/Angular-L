@@ -29,11 +29,11 @@ Favorite.init({
     },
 }, {
     sequelize: database_1.sequelize,
-    tableName: "Favorites",
+    tableName: 'Favorites',
     timestamps: true,
 });
-Favorite.belongsTo(user_1.default, { foreignKey: "user_id" });
-Favorite.belongsTo(recipe_1.default, { foreignKey: "recipe_id" });
-user_1.default.hasMany(Favorite, { foreignKey: "user_id" });
-recipe_1.default.hasMany(Favorite, { foreignKey: "recipe_id" });
+Favorite.belongsTo(user_1.default, { foreignKey: 'user_id' });
+Favorite.belongsTo(recipe_1.default, { foreignKey: 'recipe_id' });
+user_1.default.hasMany(Favorite, { foreignKey: 'user_id' });
+recipe_1.default.hasMany(Favorite, { foreignKey: 'recipe_id' });
 exports.default = Favorite;

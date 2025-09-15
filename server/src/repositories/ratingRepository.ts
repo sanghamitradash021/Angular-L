@@ -10,6 +10,8 @@ interface Rating {
   updatedAt: Date;
 }
 
+// Define the type for the result of an INSERT query
+
 const RatingRepository = {
   async getRatingByUserAndRecipe(recipeId: number, userId: number): Promise<Rating | undefined> {
     const result = await sequelize.query<Rating>(
@@ -32,6 +34,8 @@ const RatingRepository = {
     );
   },
 
+  // Update an existing rating
+
   async updateRating(recipeId: number, userId: number, rating: number) {
     await sequelize.query(
       'UPDATE Ratings SET rating = :rating, updatedAt = NOW() WHERE recipe_id = :recipeId AND user_id = :userId',
@@ -41,6 +45,8 @@ const RatingRepository = {
       },
     );
   },
+
+  // Get the average rating for a recipe
 
   async getAverageRating(recipeId: number): Promise<number> {
     const result = await sequelize.query<{ avg_rating: number }>(
@@ -53,12 +59,16 @@ const RatingRepository = {
     return result[0]?.avg_rating ?? 0; // Return avg_rating or 0 if undefined
   },
 
+  // Delete a rating by its ID
+
   async deleteRating(ratingId: number) {
     await sequelize.query('DELETE FROM Ratings WHERE rate_id = :ratingId', {
       replacements: { ratingId },
       type: QueryTypes.DELETE,
     });
   },
+
+  // Retrieve a specific rating by its ID and user ID to ensure ownership before updating or deleting
 
   async getRatingByIdAndUser(ratingId: number, userId: number): Promise<Rating | undefined> {
     const result = await sequelize.query<Rating>(

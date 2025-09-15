@@ -26,22 +26,22 @@ app.use(express_1.default.json());
 // app.use(bodyParser.json());
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
-app.use("/api/USERS", userRoutes_1.default);
-app.use("/api/recipes", recipeRoutes_1.default);
-app.use("/api/ratings", ratingRoutes_1.default);
-app.use("/api/comments", commentRoutes_1.default);
+app.use('/api/USERS', userRoutes_1.default);
+app.use('/api/recipes', recipeRoutes_1.default);
+app.use('/api/ratings', ratingRoutes_1.default);
+app.use('/api/comments', commentRoutes_1.default);
 app.use(errorHandler_1.errorHandler);
 const startServer = async () => {
     try {
         await database_1.sequelize.authenticate();
-        console.log("Database connected successfully.");
+        console.log('Database connected successfully.');
         await (0, syncmodel_1.default)();
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
     }
     catch (error) {
-        console.error("Unable to connect to the database:", error);
+        console.error('Unable to connect to the database:', error);
     }
 };
 startServer();

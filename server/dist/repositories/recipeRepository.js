@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../config/database");
 const sequelize_1 = require("sequelize");
+/* Define the Recipe interface to represent the structure of a recipe record */
 class RecipeRepository {
     async createRecipe(recipeData) {
         try {
             console.log('Repository received data:', recipeData);
-            const { title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image } = recipeData;
+            const { title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, } = recipeData;
             const ingredientsJson = JSON.stringify(ingredients);
             const query = `INSERT INTO Recipes 
                 (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt) 
@@ -21,7 +22,7 @@ class RecipeRepository {
                 difficulty,
                 cuisine,
                 mealType,
-                image: image || null // This is the key fix
+                image: image || null, // This is the key fix
             };
             console.log('SQL Query:', query);
             console.log('Replacements:', replacements);
@@ -29,23 +30,25 @@ class RecipeRepository {
                 replacements,
                 type: sequelize_1.QueryTypes.INSERT,
             });
-            const idResult = await database_1.sequelize.query("SELECT LAST_INSERT_ID() as id", { type: sequelize_1.QueryTypes.SELECT });
+            const idResult = await database_1.sequelize.query('SELECT LAST_INSERT_ID() as id', { type: sequelize_1.QueryTypes.SELECT });
             const newId = idResult?.[0]?.id ?? null;
             console.log('Created recipe with ID:', newId);
             return newId;
         }
         catch (error) {
-            console.error("Error in createRecipe repository:", error);
+            console.error('Error in createRecipe repository:', error);
             throw error;
         }
     }
+    /* Retrieve a recipe by its ID */
     async findById(id) {
-        const recipe = await database_1.sequelize.query("SELECT * FROM Recipes WHERE recipe_id = :id", {
+        const recipe = await database_1.sequelize.query('SELECT * FROM Recipes WHERE recipe_id = :id', {
             replacements: { id },
             type: sequelize_1.QueryTypes.SELECT,
         });
         return recipe.length > 0 ? recipe[0] : null;
     }
+    /* Search for recipes based on a query string */
     async searchRecipes(query) {
         return await database_1.sequelize.query(`SELECT * FROM Recipes 
             WHERE title LIKE :query OR ingredients LIKE :query OR cuisine LIKE :query OR mealType LIKE :query`, {
@@ -53,8 +56,9 @@ class RecipeRepository {
             type: sequelize_1.QueryTypes.SELECT,
         });
     }
+    /* Retrieve all recipes with pagination */
     async getAllRecipes(limit, offset) {
-        return await database_1.sequelize.query("SELECT * FROM Recipes LIMIT :limit OFFSET :offset", {
+        return await database_1.sequelize.query('SELECT * FROM Recipes LIMIT :limit OFFSET :offset', {
             replacements: { limit, offset },
             type: sequelize_1.QueryTypes.SELECT,
         });
@@ -63,9 +67,9 @@ class RecipeRepository {
     //     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
     //     const ingredientsJson = JSON.stringify(ingredients);
     //     const result = await sequelize.query(
-    //         `UPDATE Recipes 
-    //          SET title = :title, description = :description, ingredients = :ingredients, 
-    //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+    //         `UPDATE Recipes
+    //          SET title = :title, description = :description, ingredients = :ingredients,
+    //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty,
     //              cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
     //          WHERE recipe_id = :id`,
     //         {
@@ -81,9 +85,9 @@ class RecipeRepository {
     //     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
     //     const ingredientsJson = JSON.stringify(ingredients);
     //     const result = await sequelize.query(
-    //         `UPDATE Recipes 
-    //          SET title = :title, description = :description, ingredients = :ingredients, 
-    //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+    //         `UPDATE Recipes
+    //          SET title = :title, description = :description, ingredients = :ingredients,
+    //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty,
     //              cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
     //          WHERE recipe_id = :id`,
     //         {
@@ -95,6 +99,7 @@ class RecipeRepository {
     //     const affectedRows = result && Array.isArray(result) && result[1] > 0 ? result[1] : 0; // Check if the affected rows is greater than 0
     //     return affectedRows > 0;
     // }
+    /* Update an existing recipe and return the updated record */
     async updateRecipe(id, recipeData) {
         const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image } = recipeData;
         const ingredientsJson = JSON.stringify(ingredients);
@@ -103,7 +108,18 @@ class RecipeRepository {
              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
              cuisine = :cuisine, mealType = :mealType, image = :image, updatedAt = NOW()
          WHERE recipe_id = :id`, {
-            replacements: { id, title, description, ingredients: ingredientsJson, instructions, preparationTime, difficulty, cuisine, mealType, image },
+            replacements: {
+                id,
+                title,
+                description,
+                ingredients: ingredientsJson,
+                instructions,
+                preparationTime,
+                difficulty,
+                cuisine,
+                mealType,
+                image,
+            },
             type: sequelize_1.QueryTypes.UPDATE,
         });
         // After updating, fetch and return the updated recipe
@@ -118,10 +134,11 @@ class RecipeRepository {
     //     const affectedRows = Array.isArray(result) ? result[0] : 0;
     //     return affectedRows > 0;
     // }
+    /* Delete a recipe by its ID */
     async deleteRecipe(id) {
         try {
             console.log('Repository: Deleting recipe with ID:', id);
-            await database_1.sequelize.query("DELETE FROM Recipes WHERE recipe_id = :id", {
+            await database_1.sequelize.query('DELETE FROM Recipes WHERE recipe_id = :id', {
                 replacements: { id },
                 type: sequelize_1.QueryTypes.DELETE,
             });
@@ -134,20 +151,23 @@ class RecipeRepository {
             throw error;
         }
     }
+    /* Retrieve recipes by cuisine type */
     async getRecipesByCuisine(cuisine) {
-        return await database_1.sequelize.query("SELECT * FROM Recipes WHERE cuisine = :cuisine", {
+        return await database_1.sequelize.query('SELECT * FROM Recipes WHERE cuisine = :cuisine', {
             replacements: { cuisine },
             type: sequelize_1.QueryTypes.SELECT,
         });
     }
+    /* Retrieve recipes by meal type */
     async getRecipesByMealType(mealType) {
-        return await database_1.sequelize.query("SELECT * FROM Recipes WHERE mealType = :mealType", {
+        return await database_1.sequelize.query('SELECT * FROM Recipes WHERE mealType = :mealType', {
             replacements: { mealType },
             type: sequelize_1.QueryTypes.SELECT,
         });
     }
+    /* Retrieve all recipes created by a specific user */
     async getUserRecipes(userId) {
-        return await database_1.sequelize.query("SELECT * FROM Recipes WHERE user_id = :userId", {
+        return await database_1.sequelize.query('SELECT * FROM Recipes WHERE user_id = :userId', {
             replacements: { userId },
             type: sequelize_1.QueryTypes.SELECT,
         });

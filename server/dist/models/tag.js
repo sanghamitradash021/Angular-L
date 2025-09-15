@@ -20,7 +20,7 @@ Tag.init({
     },
 }, {
     sequelize: database_1.sequelize,
-    tableName: "Tags",
+    tableName: 'Tags',
     timestamps: true,
 });
 exports.default = Tag;

@@ -56,7 +56,7 @@ const router = express_1.default.Router();
  *       500:
  *         description: Error adding comment
  */
-router.post("/:recipeId", commentController_1.default.addComment);
+router.post('/:recipeId', commentController_1.default.addComment);
 /**
  * @swagger
  * /{recipeId}:
@@ -76,7 +76,7 @@ router.post("/:recipeId", commentController_1.default.addComment);
  *       500:
  *         description: Error fetching comments
  */
-router.get("/:recipeId", commentController_1.default.getComments);
+router.get('/:recipeId', commentController_1.default.getComments);
 /**
  * @swagger
  * /:
@@ -111,7 +111,7 @@ router.get("/:recipeId", commentController_1.default.getComments);
  *       500:
  *         description: Error updating comment
  */
-router.put("/", commentController_1.default.updateComment);
+router.put('/', commentController_1.default.updateComment);
 /**
  * @swagger
  * /:
@@ -142,5 +142,5 @@ router.put("/", commentController_1.default.updateComment);
  *       500:
  *         description: Error deleting comment
  */
-router.delete("/", commentController_1.default.deleteComment);
+router.delete('/', commentController_1.default.deleteComment);
 exports.default = router;

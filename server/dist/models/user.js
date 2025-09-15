@@ -37,12 +37,18 @@ User.init({
         allowNull: false,
     },
     role: {
-        type: sequelize_1.DataTypes.ENUM("user", "admin"),
-        defaultValue: "user",
+        type: sequelize_1.DataTypes.ENUM('user', 'admin'),
+        defaultValue: 'user',
     },
 }, {
     sequelize: database_1.sequelize,
-    tableName: "Users",
+    tableName: 'Users',
     timestamps: true,
+    indexes: [
+        {
+            unique: true,
+            fields: ['email']
+        }
+    ]
 });
 exports.default = User;

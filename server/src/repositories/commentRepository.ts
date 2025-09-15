@@ -11,6 +11,8 @@ interface Comment {
   updatedAt: Date;
 }
 
+
+// Define the type for the result of an INSERT query
 const CommentRepository = {
   async addComment(recipeId: number, userId: number, content: string): Promise<Comment> {
     // Insert the comment and get the inserted ID
@@ -37,6 +39,8 @@ const CommentRepository = {
     return newComment;
   },
 
+  /* Retrieve all comments for a specific recipe, including the username of the commenter */
+
   async getCommentsByRecipe(recipeId: number): Promise<Comment[]> {
     const result = await sequelize.query<Comment>(
       `SELECT c.comment_id, c.recipe_id, c.user_id, c.content, c.createdAt, c.updatedAt, u.username
@@ -52,6 +56,8 @@ const CommentRepository = {
     return result;
   },
 
+  /* Retrieve a specific comment by its ID and user ID to ensure ownership before updating or deleting */
+
   async getCommentByIdAndUser(commentId: number, userId: number): Promise<Comment | undefined> {
     const result = await sequelize.query<Comment>(
       'SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId',
@@ -63,12 +69,16 @@ const CommentRepository = {
     return result[0]; // Return the first result or undefined if not found
   },
 
+  /* Update a comment's content */
+
   async updateComment(commentId: number, content: string) {
     await sequelize.query('UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId', {
       replacements: { content, commentId },
       type: QueryTypes.UPDATE,
     });
   },
+
+  /* Delete a comment by its ID */
 
   async deleteComment(commentId: number) {
     await sequelize.query('DELETE FROM Comments WHERE comment_id = :commentId', {

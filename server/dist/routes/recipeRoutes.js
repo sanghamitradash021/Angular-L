@@ -321,7 +321,7 @@ router.post('/create', recipeController_1.default.createRecipe);
  *       200:
  *         description: List of recipes
  */
-router.get("/getall", recipeController_1.default.getAllRecipes);
+router.get('/getall', recipeController_1.default.getAllRecipes);
 /**
  * @swagger
  * /{id}:
@@ -339,7 +339,7 @@ router.get("/getall", recipeController_1.default.getAllRecipes);
  *       404:
  *         description: Recipe not found
  */
-router.get("/:id", recipeController_1.default.getRecipeById);
+router.get('/:id', recipeController_1.default.getRecipeById);
 /**
  * @swagger
  * /search/{query}:
@@ -355,7 +355,7 @@ router.get("/:id", recipeController_1.default.getRecipeById);
  *       200:
  *         description: List of matching recipes
  */
-router.get("/search/:query", recipeController_1.default.searchRecipes);
+router.get('/search/:query', recipeController_1.default.searchRecipes);
 /**
  * @swagger
  * /{id}:
@@ -383,7 +383,7 @@ router.get("/search/:query", recipeController_1.default.searchRecipes);
  *       403:
  *         description: Unauthorized
  */
-router.put("/:id", recipeController_1.default.updateRecipe);
+router.put('/:id', recipeController_1.default.updateRecipe);
 /**
  * @swagger
  * /{id}:
@@ -401,7 +401,7 @@ router.put("/:id", recipeController_1.default.updateRecipe);
  *       403:
  *         description: Unauthorized
  */
-router.delete("/:id", recipeController_1.default.deleteRecipe);
+router.delete('/:id', recipeController_1.default.deleteRecipe);
 /**
  * @swagger
  * /cuisine/{cuisine}:
@@ -417,7 +417,7 @@ router.delete("/:id", recipeController_1.default.deleteRecipe);
  *       200:
  *         description: List of recipes
  */
-router.get("/cuisine/:cuisine", recipeController_1.default.getRecipesByCuisine);
+router.get('/cuisine/:cuisine', recipeController_1.default.getRecipesByCuisine);
 /**
  * @swagger
  * /mealtype/{mealType}:
@@ -433,7 +433,7 @@ router.get("/cuisine/:cuisine", recipeController_1.default.getRecipesByCuisine);
  *       200:
  *         description: List of recipes
  */
-router.get("/mealtype/:mealType", recipeController_1.default.getRecipesByMealType);
+router.get('/mealtype/:mealType', recipeController_1.default.getRecipesByMealType);
 /**
  * @swagger
  * /my-recipes/{userId}:
@@ -449,5 +449,5 @@ router.get("/mealtype/:mealType", recipeController_1.default.getRecipesByMealTyp
  *       200:
  *         description: List of user recipes
  */
-router.get("/my-recipes/:userId", recipeController_1.default.getUserRecipes);
+router.get('/my-recipes/:userId', recipeController_1.default.getUserRecipes);
 exports.default = router;

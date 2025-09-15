@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../config/database");
 const sequelize_1 = require("sequelize");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+/* Define the User interface to represent the structure of a user record */
 class UserRepository {
     async create(userData) {
         const { username, email, password, fullname, role } = userData;
@@ -23,7 +24,7 @@ class UserRepository {
             type: sequelize_1.QueryTypes.INSERT,
         });
         // Retrieve the last inserted ID
-        const [idResult] = await database_1.sequelize.query("SELECT LAST_INSERT_ID() as id", {
+        const [idResult] = await database_1.sequelize.query('SELECT LAST_INSERT_ID() as id', {
             type: sequelize_1.QueryTypes.SELECT,
         });
         const user_id = idResult.id;
@@ -31,15 +32,16 @@ class UserRepository {
             return null;
         return this.findById(user_id);
     }
+    /* Retrieve a user by their ID */
     async findById(id) {
-        const [user] = await database_1.sequelize.query("SELECT * FROM Users WHERE user_id = :id", {
+        const [user] = await database_1.sequelize.query('SELECT * FROM Users WHERE user_id = :id', {
             replacements: { id },
             type: sequelize_1.QueryTypes.SELECT,
         });
         return user ? user : null;
     }
     async findByEmail(email) {
-        const [user] = await database_1.sequelize.query("SELECT * FROM Users WHERE email = :email", {
+        const [user] = await database_1.sequelize.query('SELECT * FROM Users WHERE email = :email', {
             replacements: { email },
             type: sequelize_1.QueryTypes.SELECT,
         });
@@ -68,7 +70,10 @@ class UserRepository {
         return affectedRows > 0;
     }
     async delete(id) {
-        const result = await database_1.sequelize.query("DELETE FROM Users WHERE user_id = :id", { replacements: { id }, type: sequelize_1.QueryTypes.DELETE });
+        const result = await database_1.sequelize.query('DELETE FROM Users WHERE user_id = :id', {
+            replacements: { id },
+            type: sequelize_1.QueryTypes.DELETE,
+        });
         const affectedRows = Array.isArray(result) ? result[1] : 0;
         return affectedRows > 0;
     }
