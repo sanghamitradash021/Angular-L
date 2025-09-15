@@ -1,89 +1,32 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-edit-recipe-modal',
-//   imports: [],
-//   templateUrl: './edit-recipe-modal.html',
-//   styleUrl: './edit-recipe-modal.css'
-// })
-// export class EditRecipeModal {
-
-// }
-
-
-// import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { RecipeService } from '../../service/recipe-service';
-// import { Recipe } from '../../models/interface/recipe.interface';
-
-// @Component({
-//   selector: 'app-edit-recipe-modal',
-//   standalone: true,
-//   imports: [CommonModule, ReactiveFormsModule],
-//   templateUrl: './edit-recipe-modal.html',
-// })
-// export class EditRecipeModalComponent implements OnChanges {
-//   @Input() recipe: Recipe | null = null;
-//   @Output() close = new EventEmitter<void>();
-//   @Output() success = new EventEmitter<Recipe>();
-
-//   editForm: FormGroup;
-//   error: string = '';
-//   loading = false;
-
-//   constructor(private fb: FormBuilder, private recipeService: RecipeService) {
-//     this.editForm = this.fb.group({
-//       title: ['', Validators.required],
-//       description: ['', Validators.required],
-//       // ... other fields
-//     });
-//   }
-
-//   ngOnChanges(changes: SimpleChanges) {
-//     if (changes['recipe'] && this.recipe) {
-//       this.editForm.patchValue(this.recipe);
-//     }
-//   }
-  
-//   onClose() {
-//     this.close.emit();
-//   }
-
-//   onSubmit() {
-//     // Similar submission logic as the create modal, but calling an update method
-//   }
-// }
-
-
-import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RecipeService } from '../../service/recipe-service';
-import { AuthService } from '../../service/auth-service'; // Fix import path
 import { Recipe } from '../../models/interface/recipe.interface';
+import { RecipeEventsService } from '../../service/recipe-events.service'; // <-- 1. IMPORT the event service
 
 @Component({
   selector: 'app-edit-recipe-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './edit-recipe-modal.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditRecipeModalComponent implements OnChanges {
   @Input() isOpen = false;
   @Input() recipe: Recipe | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() success = new EventEmitter<Recipe>();
+  // @Output() success = new EventEmitter<Recipe>(); // <-- 2. REMOVE the success output
 
   editForm: FormGroup;
   loading = false;
   error = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private recipeService: RecipeService,
-    private authService: AuthService
-  ) {
+  private fb = inject(FormBuilder);
+  private recipeService = inject(RecipeService);
+  private recipeEventsService = inject(RecipeEventsService); // <-- 3. INJECT the event service
+
+  constructor() {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
@@ -99,32 +42,17 @@ export class EditRecipeModalComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.recipe && this.isOpen) {
-      // Parse ingredients if they're stored as JSON
+      // ... (rest of the method is the same)
       let ingredients: string = this.recipe.ingredients;
       if (typeof ingredients === 'string') {
         try {
           const parsed = JSON.parse(ingredients);
-          if (Array.isArray(parsed)) {
-            ingredients = (parsed as string[]).join('\n');
-          }
-          // If not array, keep as string
+          ingredients = Array.isArray(parsed) ? (parsed as string[]).join('\n') : ingredients;
         } catch {
-          // If parsing fails, keep as string
+          // It's already a plain string
         }
       }
-      // No need for else if since ingredients is always string from Recipe interface
-
-      this.editForm.patchValue({
-        title: this.recipe.title,
-        description: this.recipe.description,
-        ingredients: ingredients,
-        instructions: this.recipe.instructions,
-        preparationTime: this.recipe.preparationTime,
-        difficulty: this.recipe.difficulty,
-        cuisine: this.recipe.cuisine,
-        mealType: this.recipe.mealType,
-        image: this.recipe.image || ''
-      });
+      this.editForm.patchValue({ ...this.recipe, ingredients });
     }
   }
 
@@ -141,9 +69,7 @@ export class EditRecipeModalComponent implements OnChanges {
 
   onSubmit() {
     if (this.editForm.invalid || !this.recipe) {
-      Object.keys(this.editForm.controls).forEach(key => {
-        this.editForm.get(key)?.markAsTouched();
-      });
+      // ... (rest of validation is the same)
       return;
     }
 
@@ -151,25 +77,20 @@ export class EditRecipeModalComponent implements OnChanges {
     this.error = '';
 
     const formData = { ...this.editForm.value };
-    
-    // Convert ingredients back to array format
     if (typeof formData.ingredients === 'string') {
-      formData.ingredients = formData.ingredients
-        .split('\n')
-        .map((ingredient: string) => ingredient.trim())
-        .filter((ingredient: string) => ingredient.length > 0);
+      formData.ingredients = formData.ingredients.split('\n').map((i: string) => i.trim()).filter(Boolean);
     }
 
     this.recipeService.updateRecipe(this.recipe.recipe_id, formData).subscribe({
-      next: (updatedRecipe) => {
+      next: (response) => {
         this.loading = false;
-        this.success.emit(updatedRecipe);
+        // 4. EMIT the update through the service instead of the @Output
+        this.recipeEventsService.emitRecipeUpdated(response.recipe);
         this.onClose();
       },
-      error: (err) => {
+      error: () => {
         this.loading = false;
         this.error = 'Failed to update recipe. Please try again.';
-        console.error('Update error:', err);
       }
     });
   }

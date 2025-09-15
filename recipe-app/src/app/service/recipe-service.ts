@@ -64,8 +64,8 @@ export class RecipeService {
     });
   }
 
-  updateRecipe(id: number, recipeData: any): Observable<Recipe> {
-  return this.http.put<Recipe>(`${this.apiUrl}/${id}`, recipeData, {
+  updateRecipe(id: number, recipeData: any): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/${id}`, recipeData, {
     headers: this.getAuthHeaders()
   });
 }

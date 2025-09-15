@@ -52,11 +52,11 @@ export class SignUpComponent {
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: () => {
-          // You might want to show a success message here
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.error = err.error.message || 'Signup failed. Please try again.';
+          // FIX: Safely access nested properties
+          this.error = err?.error?.message || 'Signup failed. Please try again.';
         }
       });
   }

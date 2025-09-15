@@ -22,6 +22,7 @@ export class AuthService {
   
   currentUser = signal<User | null>(this.getInitialUser());
 
+
   constructor(private http: HttpClient, private router: Router) {}
 
   private getInitialUser(): User | null {

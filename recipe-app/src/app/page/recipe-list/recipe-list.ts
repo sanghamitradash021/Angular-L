@@ -28,14 +28,31 @@ export class RecipeListComponent implements OnInit {
   filteredRecipes: Recipe[] = [];
   loading = true;
   mealType: string | null = null;
+  cuisine: string | null = null;
 
-  constructor(private recipeService: RecipeService, private route: ActivatedRoute) {}
+  constructor(private recipeService: RecipeService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+
+    // 1. Fetch all recipes ONCE when the component initializes.
+    this.loadRecipes();
+
+    // 2. Subscribe to query param changes to ONLY re-filter the data.
     this.route.queryParams.subscribe(params => {
-      this.mealType = params['mealType'] || null;
-      this.loadRecipes();
+      // Handle mealType parameter
+      let mealTypeParam = params['mealType'] || null;
+      if (mealTypeParam && mealTypeParam.toLowerCase() === 'snacks') {
+        mealTypeParam = 'Snack';
+      }
+      this.mealType = mealTypeParam;
+
+      // Handle cuisine parameter
+      this.cuisine = params['cuisine'] || null;
+
+      // Do not call loadRecipes() here. Call filterRecipes() instead.
+      this.filterRecipes();
     });
+
   }
 
   loadRecipes() {
@@ -47,11 +64,18 @@ export class RecipeListComponent implements OnInit {
   }
 
   filterRecipes() {
-    if (this.mealType) {
+    if (this.cuisine) {
+      // Filter by cuisine if cuisine parameter is present
+      this.filteredRecipes = this.recipes.filter(recipe =>
+        recipe.cuisine && recipe.cuisine.toLowerCase() === this.cuisine!.toLowerCase()
+      );
+    } else if (this.mealType) {
+      // Filter by mealType if mealType parameter is present
       this.filteredRecipes = this.recipes.filter(recipe =>
         recipe.mealType.toLowerCase() === this.mealType!.toLowerCase()
       );
     } else {
+      // Show all recipes if no filter is applied
       this.filteredRecipes = this.recipes;
     }
   }

@@ -191,7 +191,7 @@
 //   }
 // }
 
-import { Component, inject, OnInit, OnDestroy, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -200,19 +200,22 @@ import { AuthService } from '../../service/auth-service'; // Import your existin
 import { RecipeEventsService } from '../../service/recipe-events.service';
 import { RecipeService } from '../../service/recipe-service'; // Import RecipeService
 import { Recipe } from '../../models/interface/recipe.interface';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, CreateRecipeModalComponent],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css']
+  styleUrls: ['./navbar.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService); // Inject your existing AuthService
   private recipeEventsService = inject(RecipeEventsService);
   private recipeService = inject(RecipeService); // Inject RecipeService
+  private logger = inject(NGXLogger);
   
   // Use computed signals to reactively get auth state
   currentUser = computed(() => this.authService.currentUser());
@@ -267,7 +270,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onRecipeCreated(newRecipe: Recipe) {
-    console.log('Recipe created successfully:', newRecipe);
+    this.logger.info('Recipe created successfully:', newRecipe);
     this.closeCreateRecipeModal();
     // Emit event to notify other components about the new recipe
     this.recipeEventsService.emitRecipeCreated(newRecipe);
@@ -298,7 +301,7 @@ export class NavbarComponent implements OnInit {
         this.showDropdown = this.searchResults.length > 0;
       },
       error: (error) => {
-        console.error('Search error:', error);
+        this.logger.error('Search error:', error);
         this.searchResults = [];
         this.showDropdown = false;
       }

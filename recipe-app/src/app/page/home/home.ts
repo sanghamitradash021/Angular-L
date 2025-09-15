@@ -1,16 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-home',
-//   imports: [],
-//   templateUrl: './home.html',
-//   styleUrl: './home.css'
-// })
-// export class Home {
-
-// }
-
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../service/recipe-service';
@@ -25,20 +12,36 @@ import { RouterModule, Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
   allRecipes: Recipe[] = [];
+  displayedRecipes: Recipe[] = [];
+  showAll: boolean = false;
+  loading: boolean = true;
   isScrollingPaused = false;
 
-  constructor(private recipeService: RecipeService, private router: Router) {}
+  constructor(private recipeService: RecipeService, private router: Router) { }
 
   ngOnInit() {
+    this.loadRecipes();
+  }
+
+  loadRecipes() {
     this.recipeService.getAllRecipes().subscribe(recipes => {
       this.allRecipes = recipes;
+      this.displayedRecipes = this.allRecipes.slice(0, 6);
+      this.loading = false;
     });
+  }
+
+  onViewAll() {
+    this.displayedRecipes = this.allRecipes;
+    this.showAll = true;
+  }
+
+  onGoToAllRecipes() {
+    this.router.navigate(['/recipes']);
   }
 
   // Navigate to recipes filtered by meal type
   navigateToMealType(mealType: string) {
-    // Navigate to a recipe list page with meal type filter
-    // You might need to create a recipe-list component or modify existing one
     this.router.navigate(['/recipes'], {
       queryParams: { mealType: mealType.toLowerCase() }
     });
@@ -46,16 +49,18 @@ export class HomeComponent implements OnInit {
 
   // Manual scroll controls
   scrollLeft() {
-    const container = document.querySelector('.scrolling-container .flex') as HTMLElement;
+    const container = document.querySelector('.scrolling-container') as HTMLElement;
     if (container) {
-      container.scrollBy({ left: -320, behavior: 'smooth' }); // Scroll by one card width
+      // Scroll left by one card width smoothly without cloning nodes
+      container.scrollBy({ left: -320, behavior: 'smooth' });
     }
   }
 
   scrollRight() {
-    const container = document.querySelector('.scrolling-container .flex') as HTMLElement;
+    const container = document.querySelector('.scrolling-container') as HTMLElement;
     if (container) {
-      container.scrollBy({ left: 320, behavior: 'smooth' }); // Scroll by one card width
+      // Scroll right by one card width smoothly without cloning nodes
+      container.scrollBy({ left: 320, behavior: 'smooth' });
     }
   }
 
@@ -66,5 +71,9 @@ export class HomeComponent implements OnInit {
     if (scrollElement) {
       scrollElement.style.animationPlayState = this.isScrollingPaused ? 'paused' : 'running';
     }
+  }
+
+  showAllRecipes() {
+    this.router.navigate(['/recipes']);
   }
 }
