@@ -18,11 +18,12 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { urlInterceptor } from './interceptors/url.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([errorInterceptor])),
+    provideHttpClient(withInterceptors([urlInterceptor,errorInterceptor])),
 
 
     importProvidersFrom(

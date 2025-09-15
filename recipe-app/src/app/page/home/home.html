@@ -523,7 +523,7 @@
               <!-- Snacks Card -->
               <div
                 class="flex-shrink-0 w-80 glass-effect rounded-2xl shadow-2xl overflow-hidden cursor-pointer card-hover-effect group"
-                (click)="navigateToMealType('Snack')"
+                (click)="navigateToMealType('Snacks')"
               >
                 <div class="relative h-48 overflow-hidden">
                   <img
@@ -545,7 +545,7 @@
                   <h3
                     class="text-xl font-bold text-gray-800 mb-3 group-hover:text-yellow-600 transition-colors duration-300"
                   >
-                    Snacks
+                    Snack
                   </h3>
                   <p class="text-gray-600 line-clamp-2 mb-4 leading-relaxed">
                     Quick bites and treats for those moments between meals.
@@ -609,11 +609,11 @@
 
       <!-- Enhanced cuisine grid section with glass effect background -->
       <div class="glass-effect rounded-3xl p-8 shadow-2xl animate-fade-in-up">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-          <h2 class="text-4xl font-bold gradient-text text-center sm:text-left">Explore Cuisines</h2>
+        <div class="relative mb-6">
+          <h2 class="text-4xl font-bold gradient-text text-center">Explore Cuisines</h2>
           <button
             (click)="showAllRecipes()"
-            class="mt-2 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+            class="sm:absolute sm:top-0 sm:right-0 mt-4 sm:mt-0 mx-auto sm:mx-0 px-4 py-2 bg-red-400 text-white rounded-full hover:bg-indigo-500 transition"
           >
             Show All Recipes
           </button>
@@ -831,7 +831,7 @@
 
           <!-- Thai Cuisine Card -->
           <a
-            [routerLink]="['/recipe-list']"
+            [routerLink]="['/recipes']"
             [queryParams]="{ cuisine: 'Thai' }"
             class="glass-effect rounded-2xl shadow-xl overflow-hidden card-hover-effect group stagger-animation cursor-pointer"
           >
@@ -872,7 +872,7 @@
 
           <!-- French Cuisine Card -->
           <a
-            [routerLink]="['/recipe-list']"
+            [routerLink]="['/recipes']"
             [queryParams]="{ cuisine: 'French' }"
             class="glass-effect rounded-2xl shadow-xl overflow-hidden card-hover-effect group stagger-animation cursor-pointer"
           >
@@ -913,7 +913,7 @@
 
           <!-- Mediterranean Cuisine Card -->
           <a
-            [routerLink]="['/recipe-list']"
+            [routerLink]="['/recipes']"
             [queryParams]="{ cuisine: 'Mediterranean' }"
             class="glass-effect rounded-2xl shadow-xl overflow-hidden card-hover-effect group stagger-animation cursor-pointer"
           >

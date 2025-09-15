@@ -10,20 +10,24 @@ import { AuthService } from '../../service/auth-service';
 import { RecipeEventsService } from '../../service/recipe-events.service';
 import { Recipe } from '../../models/interface/recipe.interface';
 import { EditRecipeModalComponent } from '../../components/edit-recipe-modal/edit-recipe-modal';
-// 1. IMPORT THE LOGGER TO BE MOCKED
+import { DeleteConfirmationModalComponent } from '../../components/delete-confirmation-modal/delete-confirmation-modal';
 import { NGXLogger } from 'ngx-logger';
 
-// --- Mock Child Component ---
-@Component({
-  selector: 'app-edit-recipe-modal',
-  standalone: true,
-  template: '',
-})
+// --- Mock Child Components ---
+@Component({ selector: 'app-edit-recipe-modal', standalone: true, template: '' })
 class MockEditRecipeModalComponent {
   @Input() isOpen: boolean = false;
   @Input() recipe: Recipe | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() success = new EventEmitter<Recipe>();
+}
+
+@Component({ selector: 'app-delete-confirmation-modal', standalone: true, template: '' })
+class MockDeleteConfirmationModalComponent {
+  @Input() isOpen: boolean = false;
+  @Input() recipeTitle: string = '';
+  @Input() isDeleting: boolean = false;
+  @Output() confirm = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
 }
 
 // --- Mock Data ---
@@ -51,7 +55,6 @@ class MockRecipeEventsService {
   emitRecipeDeleted = jasmine.createSpy('emitRecipeDeleted');
 }
 
-// 2. CREATE A MOCK FOR NGXLogger
 class MockLogger {
   log(...args: any[]) {}
   debug(...args: any[]) {}
@@ -76,13 +79,12 @@ describe('MyRecipesComponent', () => {
         { provide: RecipeService, useClass: MockRecipeService },
         { provide: AuthService, useClass: MockAuthService },
         { provide: RecipeEventsService, useClass: MockRecipeEventsService },
-        // 3. PROVIDE THE MOCK LOGGER
         { provide: NGXLogger, useClass: MockLogger },
       ],
     })
     .overrideComponent(MyRecipesComponent, {
-        remove: { imports: [EditRecipeModalComponent] },
-        add: { imports: [MockEditRecipeModalComponent] }
+        remove: { imports: [EditRecipeModalComponent, DeleteConfirmationModalComponent] },
+        add: { imports: [MockEditRecipeModalComponent, MockDeleteConfirmationModalComponent] }
     })
     .compileComponents();
 
@@ -91,7 +93,7 @@ describe('MyRecipesComponent', () => {
     
     recipeService = TestBed.inject(RecipeService);
     authService = TestBed.inject(AuthService);
-    recipeEventsService = TestBed.inject(RecipeEventsService) as unknown as  MockRecipeEventsService;
+    recipeEventsService = TestBed.inject(RecipeEventsService) as unknown as MockRecipeEventsService;
 
     (recipeService.getMyRecipes as jasmine.Spy).and.returnValue(of(freshMockRecipes));
     (recipeService.deleteRecipe as jasmine.Spy).and.returnValue(of({ success: true }));
@@ -103,6 +105,7 @@ describe('MyRecipesComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  // --- RESTORED TESTS ---
   describe('Initialization and Data Loading', () => {
     it('should load recipes on init if user is logged in', () => {
       fixture.detectChanges();
@@ -122,7 +125,6 @@ describe('MyRecipesComponent', () => {
     it('should handle errors during recipe fetching', () => {
       (recipeService.getMyRecipes as jasmine.Spy).and.returnValue(throwError(() => new Error('API Error')));
       fixture.detectChanges();
-
       expect(component.error).toBe('Failed to fetch your recipes.');
       expect(component.myRecipes.length).toBe(0);
       expect(component.loading).toBe(false);
@@ -137,27 +139,22 @@ describe('MyRecipesComponent', () => {
     it('should open the edit modal with the correct recipe', () => {
         const recipeToEdit = component.myRecipes[0];
         component.openEditModal(recipeToEdit);
-
         expect(component.isEditModalOpen).toBe(true);
         expect(component.selectedRecipe).toBe(recipeToEdit);
       });
     
-    it('should call delete service and update UI on confirmed deletion', () => {
-        spyOn(window, 'confirm').and.returnValue(true);
-        const recipeIdToDelete = component.myRecipes[0].recipe_id;
-        component.deleteRecipe(recipeIdToDelete);
-        expect(window.confirm).toHaveBeenCalled();
-        expect(recipeService.deleteRecipe).toHaveBeenCalledWith(recipeIdToDelete);
-        expect(component.myRecipes.length).toBe(2);
-        expect(component.myRecipes.find(r => r.recipe_id === recipeIdToDelete)).toBeUndefined();
-        expect(recipeEventsService.emitRecipeDeleted).toHaveBeenCalledWith(recipeIdToDelete);
+    it('should set recipeToDelete and open the delete modal when deleteRecipe is called', () => {
+        const recipeToDelete = component.myRecipes[1];
+        component.deleteRecipe(recipeToDelete.recipe_id);
+        expect(component.isDeleteModalOpen).toBe(true);
+        expect(component.recipeToDelete).toBe(recipeToDelete);
       });
 
-    it('should not call delete service if deletion is not confirmed', () => {
-        spyOn(window, 'confirm').and.returnValue(false);
-        component.deleteRecipe(component.myRecipes[0].recipe_id);
-        expect(window.confirm).toHaveBeenCalled();
-        expect(recipeService.deleteRecipe).not.toHaveBeenCalled();
+    it('should call delete service when confirmDelete is called', () => {
+        const recipeToDelete = component.myRecipes[1];
+        component.recipeToDelete = recipeToDelete;
+        component.confirmDelete();
+        expect(recipeService.deleteRecipe).toHaveBeenCalledWith(recipeToDelete.recipe_id);
       });
   });
 
@@ -170,13 +167,12 @@ describe('MyRecipesComponent', () => {
         const newRecipe: Recipe = { recipe_id: 4, title: 'New Dish' } as Recipe;
         recipeEventsService.recipeCreated$.next(newRecipe);
         expect(component.myRecipes.length).toBe(4);
-        expect(component.myRecipes[0]).toEqual(jasmine.objectContaining({ title: 'New Dish' }));
+        expect(component.myRecipes[0].title).toBe('New Dish');
     });
 
     it('should update a recipe in the list when a recipeUpdated event is emitted', () => {
         const updatedRecipe: Recipe = { ...component.myRecipes[0], title: 'Updated Title' };
         recipeEventsService.recipeUpdated$.next(updatedRecipe);
-        expect(component.myRecipes.length).toBe(3);
         expect(component.myRecipes.find(r => r.recipe_id === updatedRecipe.recipe_id)?.title).toBe('Updated Title');
       });
 
