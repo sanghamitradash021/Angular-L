@@ -13,6 +13,7 @@ import { errorHandler } from './middleware/errorHandler';
 
 import { QueryTypes } from 'sequelize';
 import path from 'path';
+import logger from './config/logger';
 
 dotenv.config();
 
@@ -37,15 +38,15 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connected successfully.');
+    logger.info('Database connected successfully.');
 
     await syncTables();
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      logger.info(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    logger.info('Unable to connect to the database:', error);
   }
 };
 
