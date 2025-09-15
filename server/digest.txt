@@ -1,0 +1,3703 @@
+Directory structure:
+└── server/
+    ├── package.json
+    ├── tsconfig.json
+    ├── .eslintrc.json
+    ├── .prettierignore
+    ├── .prettierrc.json
+    └── src/
+        ├── index.ts
+        ├── swagger.ts
+        ├── config/
+        │   └── database.ts
+        ├── controllers/
+        │   ├── commentController.ts
+        │   ├── ratingController.ts
+        │   ├── recipeController.ts
+        │   └── userController.ts
+        ├── middleware/
+        │   ├── authMiddleware.ts
+        │   └── errorHandler.ts
+        ├── models/
+        │   ├── comment.ts
+        │   ├── favorite.ts
+        │   ├── rating.ts
+        │   ├── recipe.ts
+        │   ├── recipetag.ts
+        │   ├── syncmodel.ts
+        │   ├── tag.ts
+        │   └── user.ts
+        ├── repositories/
+        │   ├── commentRepository.ts
+        │   ├── ratingRepository.ts
+        │   ├── recipeRepository.ts
+        │   └── userRepository.ts
+        ├── routes/
+        │   ├── commentRoutes.ts
+        │   ├── ratingRoutes.ts
+        │   ├── recipeRoutes.ts
+        │   └── userRoutes.ts
+        ├── service/
+        │   ├── commentService.ts
+        │   ├── ratingService.ts
+        │   ├── recipeService.ts
+        │   └── userService.ts
+        └── test/
+            ├── comment.test.ts
+            ├── rating.test.ts
+            ├── recipe.test.ts
+            └── user.test.ts
+
+================================================
+FILE: package.json
+================================================
+{
+  "name": "node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "start": "tsc && node dist/index.js",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/mysql": "^2.15.26",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.12.0",
+    "node-cache": "^5.1.2",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.13.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.6.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  }
+}
+
+
+
+================================================
+FILE: tsconfig.json
+================================================
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    /* Projects */
+    // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
+    // "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
+    // "tsBuildInfoFile": "./.tsbuildinfo",              /* Specify the path to .tsbuildinfo incremental compilation file. */
+    // "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects. */
+    // "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
+    // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
+
+    /* Language and Environment */
+    "target": "ES2022",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    // "jsx": "preserve",                                /* Specify what JSX code is generated. */
+    // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
+    // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
+    // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
+    // "jsxFragmentFactory": "",                         /* Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'. */
+    // "jsxImportSource": "",                            /* Specify module specifier used to import the JSX factory functions when using 'jsx: react-jsx*'. */
+    // "reactNamespace": "",                             /* Specify the object invoked for 'createElement'. This only applies when targeting 'react' JSX emit. */
+    // "noLib": true,                                    /* Disable including any library files, including the default lib.d.ts. */
+    // "useDefineForClassFields": true,                  /* Emit ECMAScript-standard-compliant class fields. */
+    // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
+
+    /* Modules */
+    "module": "commonjs",                                /* Specify what module code is generated. */
+    "rootDir": "./src",                                  /* Specify the root folder within your source files. */
+    "moduleResolution": "node",                     /* Specify how TypeScript looks up a file from a given module specifier. */
+    // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
+    // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
+    // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
+    // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
+    // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
+    // "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */
+    // "allowImportingTsExtensions": true,               /* Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set. */
+    // "rewriteRelativeImportExtensions": true,          /* Rewrite '.ts', '.tsx', '.mts', and '.cts' file extensions in relative import paths to their JavaScript equivalent in output files. */
+    // "resolvePackageJsonExports": true,                /* Use the package.json 'exports' field when resolving package imports. */
+    // "resolvePackageJsonImports": true,                /* Use the package.json 'imports' field when resolving imports. */
+    // "customConditions": [],                           /* Conditions to set in addition to the resolver-specific defaults when resolving imports. */
+    // "noUncheckedSideEffectImports": true,             /* Check side effect imports. */
+    // "resolveJsonModule": true,                        /* Enable importing .json files. */
+    // "allowArbitraryExtensions": true,                 /* Enable importing files with any extension, provided a declaration file is present. */
+    // "noResolve": true,                                /* Disallow 'import's, 'require's or '<reference>'s from expanding the number of files TypeScript should add to a project. */
+
+    /* JavaScript Support */
+    // "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
+    // "checkJs": true,                                  /* Enable error reporting in type-checked JavaScript files. */
+    // "maxNodeModuleJsDepth": 1,                        /* Specify the maximum folder depth used for checking JavaScript files from 'node_modules'. Only applicable with 'allowJs'. */
+
+    /* Emit */
+    // "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
+    // "declarationMap": true,                           /* Create sourcemaps for d.ts files. */
+    // "emitDeclarationOnly": true,                      /* Only output d.ts files and not JavaScript files. */
+    // "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
+    // "inlineSourceMap": true,                          /* Include sourcemap files inside the emitted JavaScript. */
+    // "noEmit": true,                                   /* Disable emitting files from a compilation. */
+    // "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
+    "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+    // "removeComments": true,                           /* Disable emitting comments. */
+    // "importHelpers": true,                            /* Allow importing helper functions from tslib once per project, instead of including them per-file. */
+    // "downlevelIteration": true,                       /* Emit more compliant, but verbose and less performant JavaScript for iteration. */
+    // "sourceRoot": "",                                 /* Specify the root path for debuggers to find the reference source code. */
+    // "mapRoot": "",                                    /* Specify the location where debugger should locate map files instead of generated locations. */
+    // "inlineSources": true,                            /* Include source code in the sourcemaps inside the emitted JavaScript. */
+    // "emitBOM": true,                                  /* Emit a UTF-8 Byte Order Mark (BOM) in the beginning of output files. */
+    // "newLine": "crlf",                                /* Set the newline character for emitting files. */
+    // "stripInternal": true,                            /* Disable emitting declarations that have '@internal' in their JSDoc comments. */
+    // "noEmitHelpers": true,                            /* Disable generating custom helper functions like '__extends' in compiled output. */
+    // "noEmitOnError": true,                            /* Disable emitting files if any type checking errors are reported. */
+    // "preserveConstEnums": true,                       /* Disable erasing 'const enum' declarations in generated code. */
+    // "declarationDir": "./",                           /* Specify the output directory for generated declaration files. */
+
+    /* Interop Constraints */
+    // "isolatedModules": true,                          /* Ensure that each file can be safely transpiled without relying on other imports. */
+    // "verbatimModuleSyntax": true,                     /* Do not transform or elide any imports or exports not marked as type-only, ensuring they are written in the output file's format based on the 'module' setting. */
+    // "isolatedDeclarations": true,                     /* Require sufficient annotation on exports so other tools can trivially generate declaration files. */
+    // "allowSyntheticDefaultImports": true,             /* Allow 'import x from y' when a module doesn't have a default export. */
+    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+
+    /* Type Checking */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    // "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
+    // "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
+    // "strictFunctionTypes": true,                      /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
+    // "strictBindCallApply": true,                      /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
+    // "strictPropertyInitialization": true,             /* Check for class properties that are declared but not set in the constructor. */
+    // "strictBuiltinIteratorReturn": true,              /* Built-in iterators are instantiated with a 'TReturn' type of 'undefined' instead of 'any'. */
+    // "noImplicitThis": true,                           /* Enable error reporting when 'this' is given the type 'any'. */
+    // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */
+    // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
+    // "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
+    // "noUnusedParameters": true,                       /* Raise an error when a function parameter isn't read. */
+    // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
+    // "noImplicitReturns": true,                        /* Enable error reporting for codepaths that do not explicitly return in a function. */
+    // "noFallthroughCasesInSwitch": true,               /* Enable error reporting for fallthrough cases in switch statements. */
+    // "noUncheckedIndexedAccess": true,                 /* Add 'undefined' to a type when accessed using an index. */
+    // "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
+    // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
+    // "allowUnusedLabels": true,                        /* Disable error reporting for unused labels. */
+    // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
+
+    /* Completeness */
+    // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
+    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+  }
+}
+
+
+
+================================================
+FILE: .eslintrc.json
+================================================
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off"
+  }
+}
+
+
+================================================
+FILE: .prettierignore
+================================================
+/dist
+/node_modules
+
+
+================================================
+FILE: .prettierrc.json
+================================================
+{
+  "singleQuote": true,
+  "semi": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "printWidth": 120
+}
+
+
+================================================
+FILE: src/index.ts
+================================================
+import express from 'express';
+// import bodyParser from "body-parser";
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { sequelize } from './config/database';
+import syncTables from './models/syncmodel';
+import userRoutes from './routes/userRoutes';
+import recipeRoutes from './routes/recipeRoutes';
+import ratingRoutes from './routes/ratingRoutes';
+import commentRoutes from './routes/commentRoutes';
+import { swaggerDocs } from './swagger';
+import { errorHandler } from './middleware/errorHandler';
+
+import { QueryTypes } from 'sequelize';
+import path from 'path';
+
+dotenv.config();
+
+const app = express();
+const PORT: number = Number(process.env.PORT) || 3000;
+// const bodyParser = require('body-parser');
+swaggerDocs(app, PORT);
+
+app.use(cors());
+app.use(express.json());
+// app.use(bodyParser.json());
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/api/USERS', userRoutes);
+app.use('/api/recipes', recipeRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/comments', commentRoutes);
+app.use(errorHandler);
+
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connected successfully.');
+
+    await syncTables();
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+};
+
+startServer();
+
+
+
+================================================
+FILE: src/swagger.ts
+================================================
+import { Express, Request, Response } from 'express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+const options: swaggerJsdoc.Options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Recipe Sharing API',
+      version: '1.0.0',
+      description: 'API for managing users, recipes, ratings, and comments.',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/api/USERS',
+        description: 'User API Server',
+      },
+      {
+        url: 'http://localhost:3000/api/recipes',
+        description: 'Recipe API Server',
+      },
+      {
+        url: 'http://localhost:3000/api/ratings',
+        description: 'Ratings API Server',
+      },
+      {
+        url: 'http://localhost:3000/api/comments',
+        description: 'Comments API Server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+  apis: [
+    './src/routes/userRoutes.ts',
+    './src/routes/recipeRoutes.ts',
+    './src/routes/ratingRoutes.ts',
+    './src/routes/commentRoutes.ts',
+  ],
+};
+
+const specs = swaggerJsdoc(options);
+
+export const swaggerDocs = (app: Express, port: number): void => {
+  app.use(
+    '/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, {
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'API Documentation',
+    }),
+  );
+
+  app.get('/docs.json', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+  });
+
+  console.log(`📚 Docs available at http://localhost:${port}/docs`);
+};
+
+
+
+================================================
+FILE: src/config/database.ts
+================================================
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+export const sequelize = new Sequelize(
+  process.env.DB_NAME || 'recipe_sharing_platform',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || 'localhost',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'mysql',
+    logging: false,
+
+      pool: {
+      max: 10, // Maximum number of connections in pool
+      min: 0,  // Minimum number of connections in pool
+      acquire: 30000, // The maximum time, in milliseconds, that pool will try to get connection before throwing error
+      idle: 10000 // The maximum time, in milliseconds, that a connection can be idle before being released
+    }
+  },
+);
+
+
+
+================================================
+FILE: src/controllers/commentController.ts
+================================================
+import { Request, Response } from 'express';
+import commentService from '../service/commentService';
+
+/**
+ * Adds a new comment to a recipe.
+ * @param req - The request object containing userId, content in body and recipeId in params.
+ * @param res - The response object.
+ */
+const addComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, content } = req.body;
+    const { recipeId } = req.params;
+    const newComment = await commentService.addComment(Number(recipeId), userId, content);
+    res.status(201).json(newComment);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error adding comment', error: error.message });
+  }
+};
+
+/**
+ * Retrieves all comments for a specific recipe.
+ * @param req - The request object containing recipeId in params.
+ * @param res - The response object.
+ */
+const getComments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { recipeId } = req.params;
+    const comments = await commentService.getComments(Number(recipeId));
+    res.status(200).json(comments);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching comments', error: error.message });
+  }
+};
+
+/**
+ * Updates an existing comment.
+ * @param req - The request object containing commentId, userId, content in body.
+ * @param res - The response object.
+ */
+const updateComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { commentId, userId, content } = req.body;
+    await commentService.updateComment(commentId, userId, content);
+    res.status(200).json({ message: 'Comment updated successfully' });
+  } catch (error: any) {
+    const statusCode = error.message.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error updating comment', error });
+  }
+};
+
+/**
+ * Deletes a comment.
+ * @param req - The request object containing commentId, userId in body.
+ * @param res - The response object.
+ */
+const deleteComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { commentId, userId } = req.body;
+    await commentService.deleteComment(commentId, userId);
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error: any) {
+    const statusCode = error.message.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error deleting comment', error });
+  }
+};
+
+export default {
+  addComment,
+  getComments,
+  updateComment,
+  deleteComment,
+};
+
+
+================================================
+FILE: src/controllers/ratingController.ts
+================================================
+import { Request, Response } from 'express';
+import ratingService from '../service/ratingService';
+
+/* addRating handles both adding a new rating and updating an existing one.
+  */
+
+const addRating = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { recipeId, userId, rating } = req.body;
+    const result = await ratingService.addOrUpdateRating(recipeId, userId, rating);
+    const statusCode = result.isNew ? 201 : 200;
+    res.status(statusCode).json(result);
+  } catch (error: any) {
+    const statusCode = error.message.includes('required') || error.message.includes('must be') ? 400 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error adding/updating rating', error });
+  }
+};
+
+/** Get the average rating for a recipe
+ * @param req - The request object containing recipeId in params.
+ * @param res - The response object.
+ */
+
+const getRating = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { recipeId } = req.params;
+    const averageRating = await ratingService.getAverageRating(Number(recipeId));
+    res.status(200).json({ averageRating: averageRating || 0 });
+  } catch (error: any) {
+    const statusCode = error.message.includes('required') ? 400 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error fetching rating', error });
+  }
+};
+
+/** Get the rating given by a specific user for a specific recipe
+ * @param req - The request object containing recipeId and userId in params.
+ * @param res - The response object.
+ */
+
+const getUserRating = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { recipeId, userId } = req.params;
+    const userRating = await ratingService.getUserRating(Number(recipeId), Number(userId));
+    res.status(200).json({ userRating });
+  } catch (error: any) {
+    const statusCode = error.message.includes('required') ? 400 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error fetching user rating', error });
+  }
+};
+
+/** Update an existing rating
+ * @param req - The request object containing ratingId, userId, rating in body.
+ * @param res - The response object.
+ */ 
+
+const updateRating = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ratingId, userId, rating } = req.body;
+    await ratingService.updateRating(ratingId, userId, rating);
+    res.status(200).json({ message: 'Rating updated successfully' });
+  } catch (error: any) {
+    const statusCode = error.message.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error updating rating', error });
+  }
+};
+
+/** Delete a rating
+ * @param req - The request object containing ratingId, userId in body.
+ * @param res - The response object.
+ */
+
+const deleteRating = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ratingId, userId } = req.body;
+    await ratingService.deleteRating(ratingId, userId);
+    res.status(200).json({ message: 'Rating deleted successfully' });
+  } catch (error: any) {
+    const statusCode = error.message.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error deleting rating', error });
+  }
+};
+
+export default {
+  addRating,
+  getRating,
+  getUserRating,
+  updateRating,
+  deleteRating,
+};
+
+
+================================================
+FILE: src/controllers/recipeController.ts
+================================================
+import { Request, Response } from 'express';
+import recipeService from '../service/recipeService';
+
+/** Creates a new recipe.
+ * @param req - The request object containing recipe details in body.
+ * @param res - The response object.
+ */
+
+const createRecipe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipeData = {
+      ...req.body,
+      user_id: parseInt(req.body.user_id),
+      preparationTime: parseInt(req.body.preparationTime),
+      image: req.body.image || null,
+    };
+    const result = await recipeService.createRecipe(recipeData);
+    res.status(201).json({ message: 'Recipe created successfully', ...result });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error creating recipe', error });
+  }
+};
+
+/** Retrieves a recipe by its ID.
+ * @param req - The request object containing recipe ID in params.
+ * @param res - The response object.
+ */
+
+const getRecipeById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipe = await recipeService.getRecipeById(Number(req.params.id));
+    res.json(recipe);
+  } catch (error: any) {
+    const statusCode = error.message === 'Recipe not found' ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error fetching recipe', error });
+  }
+};
+/** Searches for recipes based on a query string.   
+ * @param req - The request object containing search query in params.
+ * @param res - The response object.
+ */
+
+const searchRecipes = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipes = await recipeService.searchRecipes(req.params.query);
+    res.json(recipes);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error searching recipes', error });
+  }
+};
+
+/** Retrieves all recipes with pagination.
+ * @param req - The request object containing page and limit in query.
+ * @param res - The response object.
+ */
+
+const getAllRecipes = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { page = 1, limit = 100 } = req.query;
+    const recipes = await recipeService.getAllRecipes(Number(page), Number(limit));
+    res.json(recipes);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
+};
+
+/** Updates an existing recipe.
+ * @param req - The request object containing recipe ID in params and updated details in body.
+ * @param res - The response object.
+ */
+
+const updateRecipe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipeId = parseInt(req.params.id);
+    const recipeData = {
+      ...req.body,
+      preparationTime: parseInt(req.body.preparationTime),
+    };
+    const updatedRecipe = await recipeService.updateRecipe(recipeId, recipeData);
+    res.status(200).json({ message: 'Recipe updated successfully', recipe: updatedRecipe });
+  } catch (error: any) {
+    const statusCode = error.message === 'Recipe not found' ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error updating recipe', error });
+  }
+};
+
+/** Deletes a recipe by its ID.
+ * @param req - The request object containing recipe ID in params.
+ * @param res - The response object.
+ */
+
+const deleteRecipe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipeId = parseInt(req.params.id);
+    const result = await recipeService.deleteRecipe(recipeId);
+    res.status(200).json({ message: 'Recipe deleted successfully', ...result });
+  } catch (error: any) {
+    const statusCode = error.message.includes('not found') ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error deleting recipe', error, success: false });
+  }
+};
+
+/** Retrieves recipes by cuisine type.
+ * @param req - The request object containing cuisine type in params.
+ * @param res - The response object.
+ */
+
+const getRecipesByCuisine = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipes = await recipeService.getRecipesByCuisine(req.params.cuisine);
+    res.json(recipes);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
+};
+
+/** Retrieves recipes by meal type.
+ * @param req - The request object containing meal type in params.
+ * @param res - The response object.
+ */
+
+const getRecipesByMealType = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipes = await recipeService.getRecipesByMealType(req.params.mealType);
+    res.json(recipes);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
+};
+
+/** Retrieves all recipes created by a specific user.
+ * @param req - The request object containing userId in params.
+ * @param res - The response object.
+ */
+
+const getUserRecipes = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const recipes = await recipeService.getUserRecipes(Number(req.params.userId));
+    res.json(recipes);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching recipes', error });
+  }
+};
+
+export default {
+  createRecipe,
+  getRecipeById,
+  searchRecipes,
+  getAllRecipes,
+  updateRecipe,
+  deleteRecipe,
+  getRecipesByCuisine,
+  getRecipesByMealType,
+  getUserRecipes,
+};
+
+
+================================================
+FILE: src/controllers/userController.ts
+================================================
+import { Request, Response } from 'express';
+import userService from '../service/userService';
+
+/** Registers a new user.
+ * @param req - The request object containing user details in body.
+ * @param res - The response object.
+ */
+
+const register = async (req: Request, res: Response): Promise<void> => {
+  try {
+    await userService.register(req.body);
+    res.status(201).json({ message: 'Profile created successfully' });
+  } catch (error: any) {
+    const statusCode = error.message === 'User already exists' ? 400 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error in registering', error });
+  }
+};
+
+/** Logs in a user.
+ * @param req - The request object containing email and password in body.
+ * @param res - The response object.
+ */
+
+const login = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await userService.login(req.body.email, req.body.password);
+    res.json(result);
+  } catch (error: any) {
+    const statusCode = error.message === 'Invalid credentials' ? 400 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error logging in', error });
+  }
+};
+
+/** Retrieves a user's profile by ID.
+ * @param req - The request object containing user ID in params.
+ * @param res - The response object.
+ */
+
+const getProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await userService.getProfile(Number(req.params.id));
+    res.json(user);
+  } catch (error: any) {
+    const statusCode = error.message === 'User not found' ? 404 : 500;
+    res.status(statusCode).json({ message: error.message || 'Error fetching profile', error });
+  }
+};
+
+/** Updates a user's profile by ID.
+ * @param req - The request object containing user ID in params and updated details in body.
+ * @param res - The response object.
+ */
+
+const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    await userService.updateProfile(Number(req.params.id), req.body);
+    res.json({ message: 'Profile updated successfully' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error updating profile', error });
+  }
+};
+
+/** Deletes a user by ID.
+ * @param req - The request object containing user ID in params.
+ * @param res - The response object.
+ */
+
+const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    await userService.deleteUser(Number(req.params.id));
+    res.json({ message: 'User deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error deleting user', error });
+  }
+};
+
+export default { register, login, getProfile, updateProfile, deleteUser };
+
+
+================================================
+FILE: src/middleware/authMiddleware.ts
+================================================
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+
+// Define the structure of the decoded JWT payload
+interface DecodedUser {
+  id: number;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
+// Middleware to authenticate user via JWT
+export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+    // Get the token from the Authorization header
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ message: 'Access denied. No token provided.' });
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as DecodedUser;
+
+    // Attach user info to the request object
+    (req as any).user = decoded;
+
+    // Proceed to the next middleware or route
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid or expired token.' });
+  }
+};
+
+
+
+================================================
+FILE: src/middleware/errorHandler.ts
+================================================
+import { Request, Response, NextFunction } from 'express';
+
+// Global error handler middleware
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
+  console.error('Error:', err.message);
+
+  res.status(500).json({
+    message: 'Something went wrong. Please try again later.',
+    error: process.env.NODE_ENV === 'design' ? err.message : undefined,
+  });
+};
+
+
+
+================================================
+FILE: src/models/comment.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+import User from './user';
+import Recipe from './recipe';
+
+class Comment extends Model {
+  public comment_id!: string;
+  public user_id!: string;
+  public recipe_id!: string;
+  public content!: string;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+Comment.init(
+  {
+    comment_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    recipe_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Comments',
+    timestamps: true,
+  },
+);
+
+Comment.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Comment.belongsTo(Recipe, { foreignKey: 'recipe_id', onDelete: 'CASCADE' });
+User.hasMany(Comment, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Recipe.hasMany(Comment, { foreignKey: 'recipe_id', onDelete: 'CASCADE' });
+
+export default Comment;
+
+
+
+================================================
+FILE: src/models/favorite.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+import User from './user';
+import Recipe from './recipe';
+
+class Favorite extends Model {
+  public fav_id!: number;
+  public user_id!: number;
+  public recipe_id!: number;
+  public createdAt!: Date;
+}
+
+Favorite.init(
+  {
+    fav_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    recipe_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Favorites',
+    timestamps: true,
+  },
+);
+
+Favorite.belongsTo(User, { foreignKey: 'user_id' });
+Favorite.belongsTo(Recipe, { foreignKey: 'recipe_id' });
+User.hasMany(Favorite, { foreignKey: 'user_id' });
+Recipe.hasMany(Favorite, { foreignKey: 'recipe_id' });
+
+export default Favorite;
+
+
+
+================================================
+FILE: src/models/rating.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+import User from './user';
+import Recipe from './recipe';
+
+class Rating extends Model {
+  public rate_id!: number;
+  public user_id!: number;
+  public recipe_id!: number;
+  public rating!: number;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+Rating.init(
+  {
+    rate_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    recipe_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 5,
+      },
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Ratings',
+    timestamps: true,
+  },
+);
+
+Rating.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Rating.belongsTo(Recipe, { foreignKey: 'recipe_id', onDelete: 'CASCADE' });
+User.hasMany(Rating, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Recipe.hasMany(Rating, { foreignKey: 'recipe_id', onDelete: 'CASCADE' });
+
+export default Rating;
+
+
+
+================================================
+FILE: src/models/recipe.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+import User from './user';
+
+class Recipe extends Model {
+  public recipe_id!: number;
+  public user_id!: string;
+  public title!: string;
+  public description!: string;
+  public ingredients!: object;
+  public instructions!: string;
+  public preparationTime!: number;
+  public dfficulty!: 'Easy' | 'Medium' | 'Hard';
+  public image!: string;
+  public cuisine!: string;
+  public mealType!: string;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+Recipe.init(
+  {
+    recipe_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+    ingredients: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    instructions: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    preparationTime: {
+      type: DataTypes.INTEGER,
+    },
+    difficulty: {
+      type: DataTypes.ENUM('Easy', 'Medium', 'Hard'),
+    },
+    image: {
+      type: DataTypes.STRING,
+    },
+    cuisine: {
+      type: DataTypes.STRING,
+    },
+    mealType: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Recipes',
+    timestamps: true,
+    indexes: [ 
+      {
+        fields: ['cuisine']
+      },
+      {
+        fields: ['mealType']
+      }
+    ]
+  },
+);
+
+Recipe.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+User.hasMany(Recipe, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+
+export default Recipe;
+
+
+
+================================================
+FILE: src/models/recipetag.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+import Recipe from './recipe';
+import Tag from './tag';
+
+class RecipeTag extends Model {
+  public recipetag_id!: number;
+  public tag_id!: number;
+}
+
+RecipeTag.init(
+  {
+    recipetag_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    tag_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'RecipeTags',
+    timestamps: false,
+  },
+);
+
+RecipeTag.belongsTo(Recipe, { foreignKey: 'recipe_id' });
+RecipeTag.belongsTo(Tag, { foreignKey: 'tag_id' });
+Recipe.hasMany(RecipeTag, { foreignKey: 'recipe_id' });
+Tag.hasMany(RecipeTag, { foreignKey: 'tag_id' });
+
+export default RecipeTag;
+
+
+
+================================================
+FILE: src/models/syncmodel.ts
+================================================
+import Recipe from './recipe';
+
+import Tag from './tag';
+import User from './user';
+import Comment from './comment';
+import Rating from './rating';
+import Favorite from './favorite';
+import RecipeTag from './recipetag';
+
+const syncTables = async () => {
+  try {
+    await User.sync();
+    console.log('User table synced successfully');
+
+    await Tag.sync();
+    console.log('Tag table synced successfully');
+
+    await Recipe.sync({ alter: true });
+    console.log('Recipe table synced successfully');
+
+    await RecipeTag.sync();
+    console.log('Recipe table synced successfully');
+
+    await Comment.sync({ alter: true });
+    console.log('Comment table synced successfully');
+
+    await Rating.sync({ alter: true });
+    console.log('Rating table synced successfully');
+
+    await Favorite.sync();
+    console.log('Favorite table synced successfully');
+  } catch (error) {
+    console.error('Error in syncing tables:', error);
+  }
+};
+
+export default syncTables;
+
+
+
+================================================
+FILE: src/models/tag.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+
+class Tag extends Model {
+  public itag_id!: string;
+  public name!: string;
+  public createdAt!: Date;
+}
+
+Tag.init(
+  {
+    tag_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Tags',
+    timestamps: true,
+  },
+);
+
+export default Tag;
+
+
+
+================================================
+FILE: src/models/user.ts
+================================================
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/database';
+
+class User extends Model {
+  public user_id!: number;
+  public username!: string;
+  public email!: string;
+  public password!: string;
+  public fullname!: string;
+  public role!: string;
+
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+User.init(
+  {
+    user_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fullname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.ENUM('user', 'admin'),
+      defaultValue: 'user',
+    },
+  },
+  {
+    sequelize,
+    tableName: 'Users',
+    timestamps: true,
+    indexes: [ 
+      {
+        unique: true,
+        fields: ['email']
+      }
+    ]
+  },
+);
+export default User;
+
+
+
+================================================
+FILE: src/repositories/commentRepository.ts
+================================================
+import { sequelize } from '../config/database';
+import { QueryTypes } from 'sequelize';
+
+interface Comment {
+  comment_id: number;
+  recipe_id: number;
+  user_id: number;
+  content: string;
+  username?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+// Define the type for the result of an INSERT query
+const CommentRepository = {
+  async addComment(recipeId: number, userId: number, content: string): Promise<Comment> {
+    // Insert the comment and get the inserted ID
+    const insertResult = await sequelize.query(
+      `INSERT INTO Comments (recipe_id, user_id, content, createdAt, updatedAt)
+            VALUES (:recipeId, :userId, :content, NOW(), NOW())`,
+      {
+        replacements: { recipeId, userId, content },
+        type: QueryTypes.INSERT,
+      },
+    );
+
+    // Get the newly inserted comment with all details
+    const [newComment] = await sequelize.query<Comment>(
+      `SELECT c.comment_id, c.recipe_id, c.user_id, c.content, c.createdAt, c.updatedAt, u.username
+             FROM Comments c
+             INNER JOIN Users u ON c.user_id = u.user_id
+             WHERE c.comment_id = LAST_INSERT_ID()`,
+      {
+        type: QueryTypes.SELECT,
+      },
+    );
+
+    return newComment;
+  },
+
+  /* Retrieve all comments for a specific recipe, including the username of the commenter */
+
+  async getCommentsByRecipe(recipeId: number): Promise<Comment[]> {
+    const result = await sequelize.query<Comment>(
+      `SELECT c.comment_id, c.recipe_id, c.user_id, c.content, c.createdAt, c.updatedAt, u.username
+             FROM Comments c
+             INNER JOIN Users u ON c.user_id = u.user_id
+             WHERE c.recipe_id = :recipeId
+             ORDER BY c.createdAt DESC`,
+      {
+        replacements: { recipeId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    return result;
+  },
+
+  /* Retrieve a specific comment by its ID and user ID to ensure ownership before updating or deleting */
+
+  async getCommentByIdAndUser(commentId: number, userId: number): Promise<Comment | undefined> {
+    const result = await sequelize.query<Comment>(
+      'SELECT * FROM Comments WHERE comment_id = :commentId AND user_id = :userId',
+      {
+        replacements: { commentId, userId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    return result[0]; // Return the first result or undefined if not found
+  },
+
+  /* Update a comment's content */
+
+  async updateComment(commentId: number, content: string) {
+    await sequelize.query('UPDATE Comments SET content = :content, updatedAt = NOW() WHERE comment_id = :commentId', {
+      replacements: { content, commentId },
+      type: QueryTypes.UPDATE,
+    });
+  },
+
+  /* Delete a comment by its ID */
+
+  async deleteComment(commentId: number) {
+    await sequelize.query('DELETE FROM Comments WHERE comment_id = :commentId', {
+      replacements: { commentId },
+      type: QueryTypes.DELETE,
+    });
+  },
+};
+
+export default CommentRepository;
+
+
+
+================================================
+FILE: src/repositories/ratingRepository.ts
+================================================
+import { sequelize } from '../config/database';
+import { QueryTypes } from 'sequelize';
+
+interface Rating {
+  recipe_id: number;
+  user_id: number;
+  rating: number;
+  rate_id: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Define the type for the result of an INSERT query
+
+const RatingRepository = {
+  async getRatingByUserAndRecipe(recipeId: number, userId: number): Promise<Rating | undefined> {
+    const result = await sequelize.query<Rating>(
+      'SELECT * FROM Ratings WHERE recipe_id = :recipeId AND user_id = :userId',
+      {
+        replacements: { recipeId, userId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    return result[0]; // Return the first result or undefined if not found
+  },
+
+  async addRating(recipeId: number, userId: number, rating: number) {
+    await sequelize.query(
+      'INSERT INTO Ratings (recipe_id, user_id, rating, createdAt, updatedAt) VALUES (:recipeId, :userId, :rating, NOW(), NOW())',
+      {
+        replacements: { recipeId, userId, rating },
+        type: QueryTypes.INSERT,
+      },
+    );
+  },
+
+  // Update an existing rating
+
+  async updateRating(recipeId: number, userId: number, rating: number) {
+    await sequelize.query(
+      'UPDATE Ratings SET rating = :rating, updatedAt = NOW() WHERE recipe_id = :recipeId AND user_id = :userId',
+      {
+        replacements: { recipeId, userId, rating },
+        type: QueryTypes.UPDATE,
+      },
+    );
+  },
+
+  // Get the average rating for a recipe
+
+  async getAverageRating(recipeId: number): Promise<number> {
+    const result = await sequelize.query<{ avg_rating: number }>(
+      'SELECT AVG(rating) AS avg_rating FROM Ratings WHERE recipe_id = :recipeId',
+      {
+        replacements: { recipeId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    return result[0]?.avg_rating ?? 0; // Return avg_rating or 0 if undefined
+  },
+
+  // Delete a rating by its ID
+
+  async deleteRating(ratingId: number) {
+    await sequelize.query('DELETE FROM Ratings WHERE rate_id = :ratingId', {
+      replacements: { ratingId },
+      type: QueryTypes.DELETE,
+    });
+  },
+
+  // Retrieve a specific rating by its ID and user ID to ensure ownership before updating or deleting
+
+  async getRatingByIdAndUser(ratingId: number, userId: number): Promise<Rating | undefined> {
+    const result = await sequelize.query<Rating>(
+      'SELECT * FROM Ratings WHERE rate_id = :ratingId AND user_id = :userId',
+      {
+        replacements: { ratingId, userId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    return result[0]; // Return the first result or undefined if not found
+  },
+};
+
+export default RatingRepository;
+
+
+
+================================================
+FILE: src/repositories/recipeRepository.ts
+================================================
+import { sequelize } from '../config/database';
+import { QueryTypes } from 'sequelize';
+import Recipe from '../models/recipe';
+
+/* Define the Recipe interface to represent the structure of a recipe record */
+
+class RecipeRepository {
+  async createRecipe(recipeData: any): Promise<number | null> {
+    try {
+      console.log('Repository received data:', recipeData);
+
+      const {
+        title,
+        user_id,
+        description,
+        ingredients,
+        instructions,
+        preparationTime,
+        difficulty,
+        cuisine,
+        mealType,
+        image,
+      } = recipeData;
+
+      const ingredientsJson = JSON.stringify(ingredients);
+
+      const query = `INSERT INTO Recipes 
+                (title, user_id, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image, createdAt, updatedAt) 
+                VALUES (:title, :user_id, :description, :ingredients, :instructions, :preparationTime, :difficulty, :cuisine, :mealType, :image, NOW(), NOW())`;
+
+      const replacements = {
+        title,
+        user_id,
+        description,
+        ingredients: ingredientsJson,
+        instructions,
+        preparationTime,
+        difficulty,
+        cuisine,
+        mealType,
+        image: image || null, // This is the key fix
+      };
+
+      console.log('SQL Query:', query);
+      console.log('Replacements:', replacements);
+
+      await sequelize.query(query, {
+        replacements,
+        type: QueryTypes.INSERT,
+      });
+
+      const idResult: any = await sequelize.query('SELECT LAST_INSERT_ID() as id', { type: QueryTypes.SELECT });
+      const newId = idResult?.[0]?.id ?? null;
+
+      console.log('Created recipe with ID:', newId);
+      return newId;
+    } catch (error) {
+      console.error('Error in createRecipe repository:', error);
+      throw error;
+    }
+  }
+
+  /* Retrieve a recipe by its ID */
+
+  async findById(id: number): Promise<any> {
+    const recipe = await sequelize.query('SELECT * FROM Recipes WHERE recipe_id = :id', {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    });
+
+    return recipe.length > 0 ? recipe[0] : null;
+  }
+
+  /* Search for recipes based on a query string */
+
+  async searchRecipes(query: string): Promise<any[]> {
+    return await sequelize.query(
+      `SELECT * FROM Recipes 
+            WHERE title LIKE :query OR ingredients LIKE :query OR cuisine LIKE :query OR mealType LIKE :query`,
+      {
+        replacements: { query: `%${query}%` },
+        type: QueryTypes.SELECT,
+      },
+    );
+  }
+
+  /* Retrieve all recipes with pagination */
+
+  async getAllRecipes(limit: number, offset: number): Promise<any[]> {
+    return await sequelize.query('SELECT * FROM Recipes LIMIT :limit OFFSET :offset', {
+      replacements: { limit, offset },
+      type: QueryTypes.SELECT,
+    });
+  }
+
+  // async updateRecipe(id: number, recipeData: any): Promise<boolean> {
+  //     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
+  //     const ingredientsJson = JSON.stringify(ingredients);
+
+  //     const result = await sequelize.query(
+  //         `UPDATE Recipes
+  //          SET title = :title, description = :description, ingredients = :ingredients,
+  //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty,
+  //              cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
+  //          WHERE recipe_id = :id`,
+  //         {
+  //             replacements: { id, title, description, ingredients: ingredientsJson, instructions, preparationTime, difficulty, cuisine, mealType },
+  //             type: QueryTypes.UPDATE,
+  //         }
+  //     );
+
+  //     // Safely get the affectedRows from the result tuple
+  //     const affectedRows = Array.isArray(result) && result[0] !== undefined ? result[0] : 0;
+  //     return affectedRows > 0;
+  // }
+
+  // async updateRecipe(id: number, recipeData: any): Promise<boolean> {
+  //     const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType } = recipeData;
+  //     const ingredientsJson = JSON.stringify(ingredients);
+
+  //     const result = await sequelize.query(
+  //         `UPDATE Recipes
+  //          SET title = :title, description = :description, ingredients = :ingredients,
+  //              instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty,
+  //              cuisine = :cuisine, mealType = :mealType, updatedAt = NOW()
+  //          WHERE recipe_id = :id`,
+  //         {
+  //             replacements: { id, title, description, ingredients: ingredientsJson, instructions, preparationTime, difficulty, cuisine, mealType },
+  //             type: QueryTypes.UPDATE,
+  //         }
+  //     );
+
+  //     console.log("Query result:", result); // Log the result for debugging
+
+  //     const affectedRows = result && Array.isArray(result) && result[1] > 0 ? result[1] : 0; // Check if the affected rows is greater than 0
+  //     return affectedRows > 0;
+  // }
+
+  /* Update an existing recipe and return the updated record */
+
+  async updateRecipe(id: number, recipeData: any): Promise<Recipe | null> {
+    const { title, description, ingredients, instructions, preparationTime, difficulty, cuisine, mealType, image } =
+      recipeData;
+    const ingredientsJson = JSON.stringify(ingredients);
+
+    const result = await sequelize.query(
+      `UPDATE Recipes 
+         SET title = :title, description = :description, ingredients = :ingredients, 
+             instructions = :instructions, preparationTime = :preparationTime, difficulty = :difficulty, 
+             cuisine = :cuisine, mealType = :mealType, image = :image, updatedAt = NOW()
+         WHERE recipe_id = :id`,
+      {
+        replacements: {
+          id,
+          title,
+          description,
+          ingredients: ingredientsJson,
+          instructions,
+          preparationTime,
+          difficulty,
+          cuisine,
+          mealType,
+          image,
+        },
+        type: QueryTypes.UPDATE,
+      },
+    );
+
+    // After updating, fetch and return the updated recipe
+    const updatedRecipe = await this.findById(id);
+    return updatedRecipe;
+  }
+
+  // async deleteRecipe(id: number): Promise<boolean> {
+  //     const result = await sequelize.query("DELETE FROM Recipes WHERE recipe_id = :id", {
+  //         replacements: { id },
+  //         type: QueryTypes.DELETE,
+  //     });
+
+  //     const affectedRows = Array.isArray(result) ? result[0] : 0;
+  //     return affectedRows > 0;
+  // }
+
+  /* Delete a recipe by its ID */
+
+  async deleteRecipe(id: number): Promise<boolean> {
+    try {
+      console.log('Repository: Deleting recipe with ID:', id);
+
+      await sequelize.query('DELETE FROM Recipes WHERE recipe_id = :id', {
+        replacements: { id },
+        type: QueryTypes.DELETE,
+      });
+
+      // Since the query executed without error, assume deletion was successful
+      // The controller already checks if the recipe exists before calling this method
+      return true;
+    } catch (error) {
+      console.error('Repository error deleting recipe:', error);
+      throw error;
+    }
+  }
+
+  /* Retrieve recipes by cuisine type */
+
+  async getRecipesByCuisine(cuisine: string): Promise<any[]> {
+    return await sequelize.query('SELECT * FROM Recipes WHERE cuisine = :cuisine', {
+      replacements: { cuisine },
+      type: QueryTypes.SELECT,
+    });
+  }
+
+  /* Retrieve recipes by meal type */
+
+  async getRecipesByMealType(mealType: string): Promise<any[]> {
+    return await sequelize.query('SELECT * FROM Recipes WHERE mealType = :mealType', {
+      replacements: { mealType },
+      type: QueryTypes.SELECT,
+    });
+  }
+
+  /* Retrieve all recipes created by a specific user */
+
+  async getUserRecipes(userId: number): Promise<any[]> {
+    return await sequelize.query('SELECT * FROM Recipes WHERE user_id = :userId', {
+      replacements: { userId },
+      type: QueryTypes.SELECT,
+    });
+  }
+}
+
+export default new RecipeRepository();
+
+
+
+================================================
+FILE: src/repositories/userRepository.ts
+================================================
+import { sequelize } from '../config/database';
+import { QueryTypes } from 'sequelize';
+import bcrypt from 'bcrypt';
+import User from '../models/user';
+
+/* Define the User interface to represent the structure of a user record */
+
+class UserRepository {
+  async create(userData: Partial<User>): Promise<User | null> {
+    const { username, email, password, fullname, role } = userData;
+
+    // Hash the password if it exists
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
+    const result = await sequelize.query(
+      `INSERT INTO Users (username, email, password, fullname, role, createdAt, updatedAt)
+             VALUES (:username, :email, :password, :fullname, :role, NOW(), NOW())`,
+      {
+        replacements: {
+          username,
+          email,
+          password: hashedPassword,
+          fullname,
+          role,
+        },
+        type: QueryTypes.INSERT,
+      },
+    );
+
+    // Retrieve the last inserted ID
+    const [idResult] = await sequelize.query('SELECT LAST_INSERT_ID() as id', {
+      type: QueryTypes.SELECT,
+    });
+
+    const user_id = (idResult as { id: number }).id;
+    if (!user_id) return null;
+
+    return this.findById(user_id);
+  }
+
+  /* Retrieve a user by their ID */
+
+  async findById(id: number): Promise<User | null> {
+    const [user]: any[] = await sequelize.query('SELECT * FROM Users WHERE user_id = :id', {
+      replacements: { id },
+      type: QueryTypes.SELECT,
+    });
+
+    return user ? (user as User) : null;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const [user]: any[] = await sequelize.query('SELECT * FROM Users WHERE email = :email', {
+      replacements: { email },
+      type: QueryTypes.SELECT,
+    });
+
+    return user ? (user as User) : null;
+  }
+
+  async validateCredentials(email: string, password: string): Promise<User | null> {
+    const user = await this.findByEmail(email);
+    if (!user || !user.password) return null;
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    return isPasswordValid ? user : null;
+  }
+
+  async update(id: number, userData: Partial<User>): Promise<boolean> {
+    const { username, email, password, fullname, role } = userData;
+
+    let hashedPassword = undefined;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    const result = await sequelize.query(
+      `UPDATE Users SET username = :username, email = :email, 
+             password = COALESCE(:password, password), fullname = :fullname, role = :role, updatedAt = NOW() 
+             WHERE user_id = :id`,
+      {
+        replacements: { id, username, email, password: hashedPassword, fullname, role },
+        type: QueryTypes.UPDATE,
+      },
+    );
+
+    const affectedRows = Array.isArray(result) ? result[1] : 0;
+    return affectedRows > 0;
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const result = await sequelize.query('DELETE FROM Users WHERE user_id = :id', {
+      replacements: { id },
+      type: QueryTypes.DELETE,
+    });
+
+    const affectedRows = Array.isArray(result) ? result[1] : 0;
+    return affectedRows > 0;
+  }
+}
+
+export default new UserRepository();
+
+
+
+================================================
+FILE: src/routes/commentRoutes.ts
+================================================
+// import express from "express";
+// import commentController from "../controllers/commentController"; // Adjust the import path as needed
+
+// const router = express.Router();
+
+// // Route to add a comment
+// router.post("/newcomment", commentController.addComment);
+
+// // Route to get all comments for a specific recipe
+// router.get("/comments/:recipeId", commentController.getComments);
+
+// // Route to update a comment
+// router.put("/comments", commentController.updateComment);
+
+// // Route to delete a comment
+// router.delete("/comments", commentController.deleteComment);
+
+// export default router;
+
+import express from 'express';
+import commentController from '../controllers/commentController'; // Adjust the import path as needed
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Comments
+ *   description: API endpoints for managing comments on recipes
+ */
+
+/**
+ * @swagger
+ * /newcomment:
+ *   post:
+ *     summary: Add a new comment to a recipe
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - recipeId
+ *               - userId
+ *               - content
+ *             properties:
+ *               recipeId:
+ *                 type: integer
+ *                 example: 1
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *               content:
+ *                 type: string
+ *                 example: "This recipe is amazing!"
+ *     responses:
+ *       201:
+ *         description: Comment added successfully
+ *       500:
+ *         description: Error adding comment
+ */
+router.post('/:recipeId', commentController.addComment);
+
+/**
+ * @swagger
+ * /{recipeId}:
+ *   get:
+ *     summary: Get all comments for a specific recipe
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe
+ *     responses:
+ *       200:
+ *         description: List of comments for the recipe
+ *       500:
+ *         description: Error fetching comments
+ */
+router.get('/:recipeId', commentController.getComments);
+
+/**
+ * @swagger
+ * /:
+ *   put:
+ *     summary: Update a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commentId
+ *               - userId
+ *               - content
+ *             properties:
+ *               commentId:
+ *                 type: integer
+ *                 example: 5
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *               content:
+ *                 type: string
+ *                 example: "Updated comment text."
+ *     responses:
+ *       200:
+ *         description: Comment updated successfully
+ *       404:
+ *         description: Comment not found or unauthorized
+ *       500:
+ *         description: Error updating comment
+ */
+router.put('/', commentController.updateComment);
+
+/**
+ * @swagger
+ * /:
+ *   delete:
+ *     summary: Delete a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commentId
+ *               - userId
+ *             properties:
+ *               commentId:
+ *                 type: integer
+ *                 example: 5
+ *               userId:
+ *                 type: integer
+ *                 example: 42
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ *       404:
+ *         description: Comment not found or unauthorized
+ *       500:
+ *         description: Error deleting comment
+ */
+router.delete('/', commentController.deleteComment);
+
+export default router;
+
+
+
+================================================
+FILE: src/routes/ratingRoutes.ts
+================================================
+import express from 'express';
+import ratingController from '../controllers/ratingController';
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /rate:
+ *   post:
+ *     summary: Add a rating for a recipe
+ *     description: Add a rating for a specific recipe by a user. If the user has already rated the recipe, it will be updated.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *               rating:
+ *                 type: integer
+ *                 description: Rating value (1-5)
+ *     responses:
+ *       201:
+ *         description: Rating added successfully
+ *       200:
+ *         description: Rating updated successfully
+ *       500:
+ *         description: Error adding or updating rating
+ */
+router.post('/rate', ratingController.addRating);
+
+/**
+ * @swagger
+ * /rate/{recipeId}:
+ *   get:
+ *     summary: Get the average rating for a recipe
+ *     description: Retrieve the average rating of a specific recipe.
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         type: integer
+ *         description: Recipe ID to get the average rating for
+ *     responses:
+ *       200:
+ *         description: Average rating retrieved successfully
+ *       500:
+ *         description: Error fetching rating
+ */
+router.get('/rate/:recipeId', ratingController.getRating);
+
+/**
+ * @swagger
+ * /rate/user/{recipeId}/{userId}:
+ *   get:
+ *     summary: Get the user's rating for a specific recipe
+ *     description: Retrieve the rating given by a specific user for a specific recipe.
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         type: integer
+ *         description: Recipe ID
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User rating retrieved successfully
+ *       404:
+ *         description: Rating not found
+ *       500:
+ *         description: Error fetching user rating
+ */
+router.get('/rate/user/:recipeId/:userId', ratingController.getUserRating);
+
+/**
+ * @swagger
+ * /rate/user/{recipeId}/{userId}:
+ *   get:
+ *     summary: Get a user's rating for a specific recipe
+ *     description: Retrieve the rating given by a specific user for a specific recipe.
+ *     parameters:
+ *       - in: path
+ *         name: recipeId
+ *         required: true
+ *         type: integer
+ *         description: Recipe ID
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User rating retrieved successfully
+ *       404:
+ *         description: Rating not found
+ *       500:
+ *         description: Error fetching rating
+ */
+router.get('/rate/user/:recipeId/:userId', ratingController.getUserRating);
+
+/**
+ * @swagger
+ * /rate:
+ *   put:
+ *     summary: Update a rating for a recipe
+ *     description: Update an existing rating for a specific recipe by a user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ratingId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *               rating:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Rating updated successfully
+ *       404:
+ *         description: Rating not found or unauthorized
+ *       500:
+ *         description: Error updating rating
+ */
+router.put('/rate', ratingController.updateRating);
+
+/**
+ * @swagger
+ * /rate:
+ *   delete:
+ *     summary: Delete a rating for a recipe
+ *     description: Delete a specific rating for a recipe based on the rating ID and user ID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ratingId:
+ *                 type: integer
+ *               userId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Rating deleted successfully
+ *       404:
+ *         description: Rating not found or unauthorized
+ *       500:
+ *         description: Error deleting rating
+ */
+router.delete('/rate', ratingController.deleteRating);
+
+export default router;
+
+
+
+================================================
+FILE: src/routes/recipeRoutes.ts
+================================================
+// import express from "express";
+// import recipeController, { createRecipe, upload } from "../controllers/recipeController";
+
+// const router = express.Router();
+
+// // Create a new recipe (protected route)
+// router.post('/create', upload.single('image'), createRecipe); // 'image' is the field name in the form
+
+// // Retrieve all recipes with pagination
+// router.get("/getall", recipeController.getAllRecipes);
+
+// // Retrieve a specific recipe by ID
+// router.get("/:id", recipeController.getRecipeById);
+
+// // Search recipes by title, ingredients, or tags
+// router.get("/search/:query", recipeController.searchRecipes);
+
+// // Update a specific recipe (only the creator can update)
+// router.put("/:id", recipeController.updateRecipe);
+
+// // Delete a specific recipe (only the creator can delete)
+// router.delete("/:id", recipeController.deleteRecipe);
+
+// // Retrieve recipes filtered by cuisine type
+// router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+
+// // Retrieve recipes filtered by meal type
+// router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+
+// // Retrieve a list of all available cuisine types
+// router.get("/allcuisine", recipeController.getAllCuisines);
+
+// // Retrieve user-specific recipes (using user_id)
+// router.get("/my-recipes/:userId", recipeController.getUserRecipes); // Changed route to use query param instead of route param
+
+// // router.get("/xyz/:userId", (req, res) => {
+// //     console.log("Received request for '/my-recipes' route.");
+// //     recipeController.getUserRecipes(req, res);
+// // });
+
+// export default router;
+
+// import express from "express";
+// import recipeController, { createRecipe, upload } from "../controllers/recipeController";
+
+// const router = express.Router();
+
+// /**
+//  * @swagger
+//  * /create:
+//  *   post:
+//  *     summary: Create a new recipe
+//  *     description: Uploads an image and creates a new recipe.
+//  *     consumes:
+//  *       - multipart/form-data
+//  *     parameters:
+//  *       - in: formData
+//  *         name: image
+//  *         type: file
+//  *         description: The image of the recipe
+//  *       - in: body
+//  *         name: recipe
+//  *         description: Recipe data
+//  *         schema:
+//  *           type: object
+//  *           required:
+//  *             - title
+//  *             - user_id
+//  *             - description
+//  *             - ingredients
+//  *             - instructions
+//  *             - preparationTime
+//  *             - difficulty
+//  *             - cuisine
+//  *             - mealType
+//  *           properties:
+//  *             title:
+//  *               type: string
+//  *             user_id:
+//  *               type: integer
+//  *             description:
+//  *               type: string
+//  *             ingredients:
+//  *               type: array
+//  *               items:
+//  *                 type: string
+//  *             instructions:
+//  *               type: string
+//  *             preparationTime:
+//  *               type: integer
+//  *             difficulty:
+//  *               type: string
+//  *             cuisine:
+//  *               type: string
+//  *             mealType:
+//  *               type: string
+//  *     responses:
+//  *       201:
+//  *         description: Recipe created successfully
+//  *       500:
+//  *         description: Error creating recipe
+//  */
+// router.post('/create', upload.single('image'), createRecipe);
+
+// /**
+//  * @swagger
+//  * /getall:
+//  *   get:
+//  *     summary: Retrieve all recipes with pagination
+//  *     parameters:
+//  *       - in: query
+//  *         name: page
+//  *         type: integer
+//  *         required: false
+//  *         description: Page number
+//  *       - in: query
+//  *         name: limit
+//  *         type: integer
+//  *         required: false
+//  *         description: Number of recipes per page
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/getall", recipeController.getAllRecipes);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   get:
+//  *     summary: Retrieve a specific recipe by ID
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe
+//  *     responses:
+//  *       200:
+//  *         description: Recipe details
+//  *       404:
+//  *         description: Recipe not found
+//  */
+// router.get("/:id", recipeController.getRecipeById);
+
+// /**
+//  * @swagger
+//  * /search/{query}:
+//  *   get:
+//  *     summary: Search recipes by title, ingredients, or tags
+//  *     parameters:
+//  *       - in: path
+//  *         name: query
+//  *         required: true
+//  *         type: string
+//  *         description: Search query
+//  *     responses:
+//  *       200:
+//  *         description: List of matching recipes
+//  */
+// router.get("/search/:query", recipeController.searchRecipes);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   put:
+//  *     summary: Update a specific recipe
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe to update
+//  *       - in: body
+//  *         name: recipe
+//  *         description: Updated recipe data
+//  *         schema:
+//  *           type: object
+//  *           properties:
+//  *             title:
+//  *               type: string
+//  *             description:
+//  *               type: string
+//  *     responses:
+//  *       200:
+//  *         description: Recipe updated successfully
+//  *       403:
+//  *         description: Unauthorized
+//  */
+// router.put("/:id", recipeController.updateRecipe);
+
+// /**
+//  * @swagger
+//  * /{id}:
+//  *   delete:
+//  *     summary: Delete a specific recipe
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         type: integer
+//  *         description: ID of the recipe to delete
+//  *     responses:
+//  *       200:
+//  *         description: Recipe deleted successfully
+//  *       403:
+//  *         description: Unauthorized
+//  */
+// router.delete("/:id", recipeController.deleteRecipe);
+
+// /**
+//  * @swagger
+//  * /cuisine/{cuisine}:
+//  *   get:
+//  *     summary: Retrieve recipes filtered by cuisine type
+//  *     parameters:
+//  *       - in: path
+//  *         name: cuisine
+//  *         required: true
+//  *         type: string
+//  *         description: Cuisine type
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/cuisine/:cuisine", recipeController.getRecipesByCuisine);
+
+// /**
+//  * @swagger
+//  * /mealtype/{mealType}:
+//  *   get:
+//  *     summary: Retrieve recipes filtered by meal type
+//  *     parameters:
+//  *       - in: path
+//  *         name: mealType
+//  *         required: true
+//  *         type: string
+//  *         description: Meal type
+//  *     responses:
+//  *       200:
+//  *         description: List of recipes
+//  */
+// router.get("/mealtype/:mealType", recipeController.getRecipesByMealType);
+
+// /**
+//  * @swagger
+//  * /my-recipes/{userId}:
+//  *   get:
+//  *     summary: Retrieve user-specific recipes
+//  *     parameters:
+//  *       - in: path
+//  *         name: userId
+//  *         required: true
+//  *         type: integer
+//  *         description: User ID
+//  *     responses:
+//  *       200:
+//  *         description: List of user recipes
+//  */
+// router.get("/my-recipes/:userId", recipeController.getUserRecipes);
+
+// export default router;
+
+// recipeRoutes.ts
+import express from 'express';
+import recipeController from '../controllers/recipeController'; // Default import
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /create:
+ *   post:
+ *     summary: Create a new recipe
+ *     description: Uploads an image and creates a new recipe.
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: image
+ *         type: file
+ *         description: The image of the recipe
+ *       - in: body
+ *         name: recipe
+ *         description: Recipe data
+ *         schema:
+ *           type: object
+ *           required:
+ *             - title
+ *             - user_id
+ *             - description
+ *             - ingredients
+ *             - instructions
+ *             - preparationTime
+ *             - difficulty
+ *             - cuisine
+ *             - mealType
+ *           properties:
+ *             title:
+ *               type: string
+ *             user_id:
+ *               type: integer
+ *             description:
+ *               type: string
+ *             ingredients:
+ *               type: array
+ *               items:
+ *                 type: string
+ *             instructions:
+ *               type: string
+ *             preparationTime:
+ *               type: integer
+ *             difficulty:
+ *               type: string
+ *             cuisine:
+ *               type: string
+ *             mealType:
+ *               type: string
+ *     responses:
+ *       201:
+ *         description: Recipe created successfully
+ *       500:
+ *         description: Error creating recipe
+ */
+// router.post('/create', recipeController.upload.single('image'), recipeController.createRecipe);
+router.post('/create', recipeController.createRecipe);
+
+/**
+ * @swagger
+ * /getall:
+ *   get:
+ *     summary: Retrieve all recipes with pagination
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         type: integer
+ *         required: false
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         type: integer
+ *         required: false
+ *         description: Number of recipes per page
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get('/getall', recipeController.getAllRecipes);
+
+/**
+ * @swagger
+ * /{id}:
+ *   get:
+ *     summary: Retrieve a specific recipe by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe
+ *     responses:
+ *       200:
+ *         description: Recipe details
+ *       404:
+ *         description: Recipe not found
+ */
+router.get('/:id', recipeController.getRecipeById);
+
+/**
+ * @swagger
+ * /search/{query}:
+ *   get:
+ *     summary: Search recipes by title, ingredients, or tags
+ *     parameters:
+ *       - in: path
+ *         name: query
+ *         required: true
+ *         type: string
+ *         description: Search query
+ *     responses:
+ *       200:
+ *         description: List of matching recipes
+ */
+router.get('/search/:query', recipeController.searchRecipes);
+
+/**
+ * @swagger
+ * /{id}:
+ *   put:
+ *     summary: Update a specific recipe
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe to update
+ *       - in: body
+ *         name: recipe
+ *         description: Updated recipe data
+ *         schema:
+ *           type: object
+ *           properties:
+ *             title:
+ *               type: string
+ *             description:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Recipe updated successfully
+ *       403:
+ *         description: Unauthorized
+ */
+router.put('/:id', recipeController.updateRecipe);
+
+/**
+ * @swagger
+ * /{id}:
+ *   delete:
+ *     summary: Delete a specific recipe
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: integer
+ *         description: ID of the recipe to delete
+ *     responses:
+ *       200:
+ *         description: Recipe deleted successfully
+ *       403:
+ *         description: Unauthorized
+ */
+router.delete('/:id', recipeController.deleteRecipe);
+
+/**
+ * @swagger
+ * /cuisine/{cuisine}:
+ *   get:
+ *     summary: Retrieve recipes filtered by cuisine type
+ *     parameters:
+ *       - in: path
+ *         name: cuisine
+ *         required: true
+ *         type: string
+ *         description: Cuisine type
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get('/cuisine/:cuisine', recipeController.getRecipesByCuisine);
+
+/**
+ * @swagger
+ * /mealtype/{mealType}:
+ *   get:
+ *     summary: Retrieve recipes filtered by meal type
+ *     parameters:
+ *       - in: path
+ *         name: mealType
+ *         required: true
+ *         type: string
+ *         description: Meal type
+ *     responses:
+ *       200:
+ *         description: List of recipes
+ */
+router.get('/mealtype/:mealType', recipeController.getRecipesByMealType);
+
+/**
+ * @swagger
+ * /my-recipes/{userId}:
+ *   get:
+ *     summary: Retrieve user-specific recipes
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of user recipes
+ */
+router.get('/my-recipes/:userId', recipeController.getUserRecipes);
+
+export default router;
+
+
+
+================================================
+FILE: src/routes/userRoutes.ts
+================================================
+import express from 'express';
+import userController from '../controllers/userController';
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               fullname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *       400:
+ *         description: User already exists
+ */
+router.post('/register', userController.register);
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, returns token
+ *       400:
+ *         description: Invalid credentials
+ */
+router.post('/login', userController.login);
+
+/**
+ * @swagger
+ * /profile/{id}:
+ *   get:
+ *     summary: Get user profile by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *       404:
+ *         description: User not found
+ */
+router.get('/profile/:id', userController.getProfile);
+
+/**
+ * @swagger
+ * /profile/{id}:
+ *   patch:
+ *     summary: Update user profile
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               fullname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       500:
+ *         description: Error updating profile
+ */
+router.patch('/profile/:id', userController.updateProfile);
+
+/**
+ * @swagger
+ * /user/{id}:
+ *   delete:
+ *     summary: Delete a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       500:
+ *         description: Error deleting user
+ */
+router.delete('/user/:id', userController.deleteUser);
+
+export default router;
+
+
+
+================================================
+FILE: src/service/commentService.ts
+================================================
+import CommentRepository from '../repositories/commentRepository';
+
+class CommentService {
+
+    /* Add a new comment to a recipe */
+  async addComment(recipeId: number, userId: number, content: string) {
+    return await CommentRepository.addComment(recipeId, userId, content);
+  }
+/* Get all comments for a specific recipe */
+  async getComments(recipeId: number) {
+    return await CommentRepository.getCommentsByRecipe(recipeId);
+  }
+/* Update an existing comment */
+  async updateComment(commentId: number, userId: number, content: string): Promise<void> {
+    const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+    if (!existingComment) {
+      throw new Error('Comment not found or unauthorized');
+    }
+    await CommentRepository.updateComment(commentId, content);
+  }
+/* Delete a comment */
+  async deleteComment(commentId: number, userId: number): Promise<void> {
+    const existingComment = await CommentRepository.getCommentByIdAndUser(commentId, userId);
+    if (!existingComment) {
+      throw new Error('Comment not found or unauthorized');
+    }
+    await CommentRepository.deleteComment(commentId);
+  }
+}
+
+export default new CommentService();
+
+
+================================================
+FILE: src/service/ratingService.ts
+================================================
+import RatingRepository from '../repositories/ratingRepository';
+
+class RatingService {
+/* Add or update a rating for a recipe by a user */ 
+
+  async addOrUpdateRating(recipeId: number, userId: number, rating: number): Promise<{ message: string; rating: number; recipeId: number; isNew: boolean }> {
+    if (!recipeId || !userId || rating === undefined) {
+      throw new Error('Missing required fields: recipeId, userId, or rating');
+    }
+    if (rating < 1 || rating > 5) {
+      throw new Error('Rating must be between 1 and 5');
+    }
+
+    const existingRating = await RatingRepository.getRatingByUserAndRecipe(recipeId, userId);
+
+    if (existingRating) {
+      await RatingRepository.updateRating(recipeId, userId, rating);
+      return { message: 'Rating updated successfully', rating, recipeId, isNew: false };
+    } else {
+      await RatingRepository.addRating(recipeId, userId, rating);
+      return { message: 'Rating added successfully', rating, recipeId, isNew: true };
+    }
+  }
+
+  /* Get the average rating for a recipe */
+
+  async getAverageRating(recipeId: number): Promise<number> {
+    if (!recipeId) {
+      throw new Error('Recipe ID is required');
+    }
+    return await RatingRepository.getAverageRating(recipeId);
+  }
+
+  /* Get a user's rating for a specific recipe */
+
+  async getUserRating(recipeId: number, userId: number): Promise<number> {
+    if (!recipeId || !userId) {
+      throw new Error('Recipe ID and User ID are required');
+    }
+    const userRating = await RatingRepository.getRatingByUserAndRecipe(recipeId, userId);
+    return userRating ? userRating.rating : 0;
+  }
+
+  /* Update an existing rating */
+
+  async updateRating(ratingId: number, userId: number, rating: number): Promise<void> {
+    const existingRating = await RatingRepository.getRatingByIdAndUser(ratingId, userId);
+    if (!existingRating) {
+      throw new Error('Rating not found or unauthorized');
+    }
+    await RatingRepository.updateRating(existingRating.recipe_id, userId, rating);
+  }
+
+  /* Delete a rating */
+
+  async deleteRating(ratingId: number, userId: number): Promise<void> {
+    const existingRating = await RatingRepository.getRatingByIdAndUser(ratingId, userId);
+    if (!existingRating) {
+      throw new Error('Rating not found or unauthorized');
+    }
+    await RatingRepository.deleteRating(ratingId);
+  }
+}
+
+export default new RatingService();
+
+
+================================================
+FILE: src/service/recipeService.ts
+================================================
+import recipeRepository from '../repositories/recipeRepository';
+import Recipe from '../models/recipe';
+import NodeCache from 'node-cache';
+
+const recipeCache = new NodeCache({ stdTTL: 300 });
+
+class RecipeService {
+
+    /* Create a new recipe */
+
+  async createRecipe(recipeData: any): Promise<{ recipeId: number; recipe: any }> {
+    if (typeof recipeData.ingredients === 'string') {
+      recipeData.ingredients = recipeData.ingredients
+        .split('\n')
+        .map((ingredient: string) => ingredient.trim())
+        .filter((ingredient: string) => ingredient.length > 0);
+    }
+
+    const recipeId = await recipeRepository.createRecipe(recipeData);
+    if (!recipeId) {
+      throw new Error('Failed to create recipe');
+    }
+    return { recipeId, recipe: recipeData };
+  }
+/* Retrieve a recipe by its ID */
+//   async getRecipeById(id: number): Promise<Recipe> {
+//     const recipe = await recipeRepository.findById(id);
+//     if (!recipe) {
+//       throw new Error('Recipe not found');
+//     }
+//     return recipe;
+//   }
+
+
+async getRecipeById(id: number): Promise<Recipe> {
+    // 1. Define a unique cache key for this recipe.
+    const cacheKey = `recipe_${id}`;
+
+    // 2. Try to get the recipe from the cache.
+    const cachedRecipe = recipeCache.get<Recipe>(cacheKey);
+
+    // 3. If the recipe is found in the cache, return it instantly.
+    if (cachedRecipe) {
+        console.log(`CACHE HIT: Found recipe ${id} in cache.`);
+        return cachedRecipe;
+    }
+
+    // 4. If not in the cache, fetch it from the database.
+    console.log(`CACHE MISS: Fetching recipe ${id} from database.`);
+    const recipe = await recipeRepository.findById(id); 
+    if (!recipe) {
+        throw new Error('Recipe not found'); 
+    }
+
+    // 5. Store the newly fetched recipe in the cache before returning.
+    recipeCache.set(cacheKey, recipe);
+
+    return recipe; 
+}
+
+  /* Search for recipes based on a query string */
+
+  async searchRecipes(query: string): Promise<Recipe[]> {
+    return recipeRepository.searchRecipes(query);
+  }
+
+  /* Retrieve all recipes with pagination */
+
+  async getAllRecipes(page: number, limit: number): Promise<Recipe[]> {
+    const offset = (page - 1) * limit;
+    return recipeRepository.getAllRecipes(limit, offset);
+  }
+
+  /* Update an existing recipe */
+
+//   async updateRecipe(id: number, recipeData: any): Promise<Recipe> {
+//     if (typeof recipeData.ingredients === 'string') {
+//       recipeData.ingredients = recipeData.ingredients
+//         .split('\n')
+//         .map((ingredient: string) => ingredient.trim())
+//         .filter((ingredient: string) => ingredient.length > 0);
+//     }
+
+//     const updatedRecipe = await recipeRepository.updateRecipe(id, recipeData);
+//     if (!updatedRecipe) {
+//       throw new Error('Recipe not found');
+//     }
+//     return updatedRecipe;
+//   }
+
+async updateRecipe(id: number, recipeData: any): Promise<Recipe> {
+    if (typeof recipeData.ingredients === 'string') {
+        recipeData.ingredients = recipeData.ingredients
+            .split('\n')
+            .map((ingredient: string) => ingredient.trim())
+            .filter((ingredient: string) => ingredient.length > 0); 
+    }
+
+    const updatedRecipe = await recipeRepository.updateRecipe(id, recipeData); 
+    if (!updatedRecipe) {
+        throw new Error('Recipe not found'); 
+    }
+
+    // --- CACHE INVALIDATION ---
+    const cacheKey = `recipe_${id}`;
+    console.log(`INVALIDATE CACHE: Updating recipe ${id} in cache.`);
+    // Set the cache with the new, updated recipe data.
+    // This overwrites the old entry if it exists.
+    recipeCache.set(cacheKey, updatedRecipe);
+    // --- END CACHE INVALIDATION ---
+
+    return updatedRecipe; 
+}
+
+  /* Delete a recipe by its ID */
+
+//   async deleteRecipe(id: number): Promise<{ success: boolean; recipeId: number }> {
+//     const existingRecipe = await recipeRepository.findById(id);
+//     if (!existingRecipe) {
+//       throw new Error('Recipe not found - may have been already deleted');
+//     }
+
+//     const deleted = await recipeRepository.deleteRecipe(id);
+//     if (!deleted) {
+//       throw new Error('Failed to delete recipe');
+//     }
+//     return { success: true, recipeId: id };
+//   }
+
+async deleteRecipe(id: number): Promise<{ success: boolean; recipeId: number }> {
+    const existingRecipe = await recipeRepository.findById(id); 
+    if (!existingRecipe) {
+        throw new Error('Recipe not found - may have been already deleted'); 
+    }
+
+    const deleted = await recipeRepository.deleteRecipe(id);
+    if (!deleted) {
+        throw new Error('Failed to delete recipe');
+    }
+
+    // --- CACHE INVALIDATION ---
+    const cacheKey = `recipe_${id}`;
+    console.log(`INVALIDATE CACHE: Deleting recipe ${id} from cache.`);
+    // Delete the entry from the cache.
+    recipeCache.del(cacheKey);
+    // --- END CACHE INVALIDATION ---
+
+    return { success: true, recipeId: id }; 
+}
+
+  /* Get recipes by cuisine type */
+
+  async getRecipesByCuisine(cuisine: string): Promise<Recipe[]> {
+    return recipeRepository.getRecipesByCuisine(cuisine);
+  }
+
+  /* Get recipes by meal type */
+
+  async getRecipesByMealType(mealType: string): Promise<Recipe[]> {
+    return recipeRepository.getRecipesByMealType(mealType);
+  }
+  /* Get recipes created by a specific user */
+
+  async getUserRecipes(userId: number): Promise<Recipe[]> {
+    return recipeRepository.getUserRecipes(userId);
+  }
+}
+
+export default new RecipeService();
+
+
+================================================
+FILE: src/service/userService.ts
+================================================
+import jwt from 'jsonwebtoken';
+import userRepository from '../repositories/userRepository';
+import User from '../models/user';
+
+class UserService {
+
+    /* Register a new user */
+  async register(userData: Partial<User>): Promise<User> {
+    const userExists = await userRepository.findByEmail(userData.email!);
+    if (userExists) {
+      throw new Error('User already exists');
+    }
+
+    const newUser = await userRepository.create(userData);
+    if (!newUser) {
+      throw new Error('Failed to create user');
+    }
+    return newUser;
+  }
+
+  /* User login */
+
+  async login(email: string, password: string): Promise<{ user: any; token: string }> {
+    const user = await userRepository.validateCredentials(email, password);
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
+
+    return {
+      user: { id: user.user_id, username: user.username, email: user.email, fullname: user.fullname },
+      token,
+    };
+  }
+
+  /* Get user profile by ID */
+
+  async getProfile(id: number): Promise<User> {
+    const user = await userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
+
+  /* Update user profile by ID */
+
+  async updateProfile(id: number, userData: Partial<User>): Promise<boolean> {
+    const success = await userRepository.update(id, userData);
+    if (!success) {
+      throw new Error('Failed to update profile');
+    }
+    return true;
+  }
+
+  /* Delete a user by ID */
+
+  async deleteUser(id: number): Promise<boolean> {
+    const success = await userRepository.delete(id);
+    if (!success) {
+      throw new Error('Failed to delete user');
+    }
+    return true;
+  }
+}
+
+export default new UserService();
+
+
+================================================
+FILE: src/test/comment.test.ts
+================================================
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { Request, Response } from 'express';
+import commentController from '../controllers/commentController';
+import commentService from '../service/commentService';
+
+// Mock the commentService
+vi.mock('../service/commentService', () => ({
+  default: {
+    addComment: vi.fn(),
+    getComments: vi.fn(),
+    deleteComment: vi.fn(),
+  },
+}));
+
+describe('Comment Controller', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let status: Mock;
+  let json: Mock;
+
+  beforeEach(() => {
+    json = vi.fn();
+    status = vi.fn(() => ({ json }));
+    req = {
+      body: {},
+      params: {},
+    };
+    res = {
+      status,
+      json,
+    };
+    vi.clearAllMocks();
+  });
+
+  // Test for adding a comment
+  describe('addComment', () => {
+    it('should add a comment and return the new comment', async () => {
+      const newComment = { comment_id: 1, content: 'Great recipe!', userId: 1 };
+      req.params = { recipeId: '1' };
+      req.body = { userId: 1, content: 'Great recipe!' };
+
+      (commentService.addComment as Mock).mockResolvedValue(newComment);
+
+      await commentController.addComment(req as Request, res as Response);
+
+      expect(commentService.addComment).toHaveBeenCalledWith(1, 1, 'Great recipe!');
+      expect(status).toHaveBeenCalledWith(201);
+      expect(json).toHaveBeenCalledWith(newComment);
+    });
+  });
+
+  // Test for getting comments for a recipe
+  describe('getComments', () => {
+    it('should retrieve all comments for a given recipe', async () => {
+      const comments = [{ content: 'Comment 1' }, { content: 'Comment 2' }];
+      req.params = { recipeId: '1' };
+      (commentService.getComments as Mock).mockResolvedValue(comments);
+
+      await commentController.getComments(req as Request, res as Response);
+
+      expect(commentService.getComments).toHaveBeenCalledWith(1);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith(comments);
+    });
+  });
+
+  // Test for deleting a comment
+  describe('deleteComment', () => {
+    it('should delete a comment if it exists and belongs to the user', async () => {
+      req.body = { commentId: 1, userId: 1 };
+      (commentService.deleteComment as Mock).mockResolvedValue(true);
+
+      await commentController.deleteComment(req as Request, res as Response);
+
+      expect(commentService.deleteComment).toHaveBeenCalledWith(1, 1);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith({ message: 'Comment deleted successfully' });
+    });
+
+    it('should return 404 if comment not found or user is unauthorized', async () => {
+      req.body = { commentId: 99, userId: 1 };
+      const error = new Error('Comment not found or unauthorized');
+      (commentService.deleteComment as Mock).mockRejectedValue(error);
+
+      await commentController.deleteComment(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(404);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Comment not found or unauthorized' }));
+    });
+  });
+});
+
+
+================================================
+FILE: src/test/rating.test.ts
+================================================
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { Request, Response } from 'express';
+import ratingController from '../controllers/ratingController';
+import ratingService from '../service/ratingService';
+
+// Mock the ratingService
+vi.mock('../service/ratingService', () => ({
+  default: {
+    addOrUpdateRating: vi.fn(),
+    getAverageRating: vi.fn(),
+  },
+}));
+
+describe('Rating Controller', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let status: Mock;
+  let json: Mock;
+
+  beforeEach(() => {
+    json = vi.fn();
+    status = vi.fn(() => ({ json }));
+    req = {
+      body: {},
+      params: {},
+    };
+    res = {
+      status,
+      json,
+    };
+    vi.clearAllMocks();
+  });
+
+  // Test for adding/updating a rating
+  describe('addRating', () => {
+    it('should add a new rating when one does not exist', async () => {
+      req.body = { recipeId: 1, userId: 1, rating: 5 };
+      const serviceResult = { message: 'Rating added successfully', rating: 5, recipeId: 1, isNew: true };
+      (ratingService.addOrUpdateRating as Mock).mockResolvedValue(serviceResult);
+
+      await ratingController.addRating(req as Request, res as Response);
+
+      expect(ratingService.addOrUpdateRating).toHaveBeenCalledWith(1, 1, 5);
+      expect(status).toHaveBeenCalledWith(201);
+      expect(json).toHaveBeenCalledWith(serviceResult);
+    });
+
+    it('should update an existing rating', async () => {
+      req.body = { recipeId: 1, userId: 1, rating: 4 };
+      const serviceResult = { message: 'Rating updated successfully', rating: 4, recipeId: 1, isNew: false };
+
+      (ratingService.addOrUpdateRating as Mock).mockResolvedValue(serviceResult);
+
+      await ratingController.addRating(req as Request, res as Response);
+
+      expect(ratingService.addOrUpdateRating).toHaveBeenCalledWith(1, 1, 4);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith(serviceResult);
+    });
+
+    it('should return 400 for invalid rating value', async () => {
+      req.body = { recipeId: 1, userId: 1, rating: 6 }; // Invalid rating
+      const error = new Error('Rating must be between 1 and 5');
+      (ratingService.addOrUpdateRating as Mock).mockRejectedValue(error);
+
+      await ratingController.addRating(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Rating must be between 1 and 5' }));
+    });
+  });
+
+  // Test for getting average rating
+  describe('getRating', () => {
+    it('should get the average rating for a recipe', async () => {
+      req.params = { recipeId: '1' };
+      (ratingService.getAverageRating as Mock).mockResolvedValue(4.5);
+
+      await ratingController.getRating(req as Request, res as Response);
+
+      expect(ratingService.getAverageRating).toHaveBeenCalledWith(1);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith({ averageRating: 4.5 });
+    });
+
+    it('should return 0 if no ratings exist', async () => {
+      req.params = { recipeId: '1' };
+      (ratingService.getAverageRating as Mock).mockResolvedValue(0);
+
+      await ratingController.getRating(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith({ averageRating: 0 });
+    });
+  });
+});
+
+
+================================================
+FILE: src/test/recipe.test.ts
+================================================
+import { describe, it, expect, vi, beforeEach,Mock,Mocked } from 'vitest';
+import { Request, Response } from 'express';
+import recipeController from '../controllers/recipeController';
+import recipeService from '../service/recipeService';
+
+// Provide a manual mock factory for the recipeService module.
+vi.mock('../service/recipeService', () => ({
+  default: {
+    createRecipe: vi.fn(),
+    getRecipeById: vi.fn(),
+    getAllRecipes: vi.fn(),
+    deleteRecipe: vi.fn(),
+  },
+}));
+
+describe('Recipe Controller', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let status: Mock;
+  let json: Mock;
+
+  // Cast the imported service to its mocked version for type safety.
+  const mockedRecipeService = recipeService as Mocked<typeof recipeService>;
+
+  beforeEach(() => {
+    json = vi.fn();
+    status = vi.fn(() => ({ json }));
+    req = {
+      body: {},
+      params: {},
+      query: {},
+    };
+    res = {
+      status,
+      json,
+    };
+    // Reset mocks before each test to ensure isolation
+    vi.clearAllMocks();
+  });
+
+  // Test for creating a recipe
+  describe('createRecipe', () => {
+    it('should create a recipe and return success message with ID', async () => {
+      const recipeData = { title: 'Test Pasta', user_id: '1', ingredients: 'Pasta, Sauce' };
+      const serviceResult = { recipeId: 101, recipe: recipeData };
+      req.body = recipeData;
+      mockedRecipeService.createRecipe.mockResolvedValue(serviceResult);
+
+      await recipeController.createRecipe(req as Request, res as Response);
+
+      expect(mockedRecipeService.createRecipe).toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(201);
+      expect(json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Recipe created successfully',
+          recipeId: 101,
+        }),
+      );
+    });
+
+    it('should return 500 if recipe creation fails', async () => {
+      req.body = { title: 'Test Pasta' };
+      const error = new Error('Failed to create recipe');
+      mockedRecipeService.createRecipe.mockRejectedValue(error);
+
+      await recipeController.createRecipe(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(500);
+      // Use expect.objectContaining to ignore the extra 'error' property
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to create recipe' }));
+    });
+  });
+
+  // Test for getting a recipe by ID
+  describe('getRecipeById', () => {
+    it('should return a recipe when found', async () => {
+      const recipe = { recipe_id: 1, title: 'Test Recipe' };
+      req.params = { id: '1' };
+      mockedRecipeService.getRecipeById.mockResolvedValue(recipe as any);
+
+      await recipeController.getRecipeById(req as Request, res as Response);
+
+      expect(mockedRecipeService.getRecipeById).toHaveBeenCalledWith(1);
+      expect(json).toHaveBeenCalledWith(recipe);
+    });
+
+    it('should return 404 when recipe is not found', async () => {
+      req.params = { id: '99' };
+      const error = new Error('Recipe not found');
+      mockedRecipeService.getRecipeById.mockRejectedValue(error);
+
+      await recipeController.getRecipeById(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(404);
+      // Use expect.objectContaining to ignore the extra 'error' property
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Recipe not found' }));
+    });
+  });
+
+  // Test for getting all recipes
+  describe('getAllRecipes', () => {
+    it('should return a list of recipes', async () => {
+      const recipes = [
+        { id: 1, title: 'Recipe 1' },
+        { id: 2, title: 'Recipe 2' },
+      ];
+      req.query = { page: '1', limit: '10' };
+      mockedRecipeService.getAllRecipes.mockResolvedValue(recipes as any);
+
+      await recipeController.getAllRecipes(req as Request, res as Response);
+
+      expect(mockedRecipeService.getAllRecipes).toHaveBeenCalledWith(1, 10);
+      expect(json).toHaveBeenCalledWith(recipes);
+    });
+  });
+
+  // Test for deleting a recipe
+  describe('deleteRecipe', () => {
+    it('should delete a recipe and return success', async () => {
+      req.params = { id: '1' };
+      mockedRecipeService.deleteRecipe.mockResolvedValue({ success: true, recipeId: 1 });
+
+      await recipeController.deleteRecipe(req as Request, res as Response);
+
+      expect(mockedRecipeService.deleteRecipe).toHaveBeenCalledWith(1);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Recipe deleted successfully',
+          success: true,
+        }),
+      );
+    });
+
+    it('should return 404 if recipe to delete is not found', async () => {
+      req.params = { id: '99' };
+      const error = new Error('Recipe not found - may have been already deleted');
+      mockedRecipeService.deleteRecipe.mockRejectedValue(error);
+
+      await recipeController.deleteRecipe(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(404);
+      expect(json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Recipe not found - may have been already deleted',
+        }),
+      );
+    });
+  });
+});
+
+
+================================================
+FILE: src/test/user.test.ts
+================================================
+import { describe, it, expect, vi, beforeEach, Mock , Mocked} from 'vitest';
+import { Request, Response } from 'express';
+import userController from '../controllers/userController';
+import userService from '../service/userService'; // Import the actual service
+
+// Provide a manual mock factory for the userService module.
+// This ensures that all exported functions are replaced with vi.fn() spies.
+vi.mock('../service/userService', () => ({
+  default: {
+    register: vi.fn(),
+    login: vi.fn(),
+    getProfile: vi.fn(),
+    deleteUser: vi.fn(),
+  },
+}));
+
+describe('User Controller', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let status: Mock;
+  let json: Mock;
+
+  // Cast the imported service to its mocked version for type safety.
+  const mockedUserService = userService as Mocked<typeof userService>;
+
+  beforeEach(() => {
+    json = vi.fn();
+    status = vi.fn(() => ({ json }));
+    req = {
+      body: {},
+      params: {},
+    };
+    res = {
+      status,
+      json,
+    };
+    // Reset mocks before each test to ensure isolation
+    vi.clearAllMocks();
+  });
+
+  // Test for user registration
+  describe('register', () => {
+    const fullUserData = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+      fullname: 'Test User',
+      role: 'user',
+    };
+
+    it('should create a new user and return a success message', async () => {
+      req.body = fullUserData;
+      // This will now work because mockedUserService.register is a vi.fn()
+      mockedUserService.register.mockResolvedValue({ user_id: 1 } as any);
+
+      await userController.register(req as Request, res as Response);
+
+      expect(mockedUserService.register).toHaveBeenCalledWith(req.body);
+      expect(status).toHaveBeenCalledWith(201);
+      expect(json).toHaveBeenCalledWith({ message: 'Profile created successfully' });
+    });
+
+    it('should return 400 if user already exists', async () => {
+      req.body = fullUserData;
+      const error = new Error('User already exists');
+      mockedUserService.register.mockRejectedValue(error);
+
+      await userController.register(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'User already exists' }));
+    });
+
+    it('should return 500 on a generic registration error', async () => {
+      req.body = fullUserData;
+      const error = new Error('Database error');
+      mockedUserService.register.mockRejectedValue(error);
+
+      await userController.register(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(500);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Database error', error }));
+    });
+  });
+
+  // Test for user login
+  describe('login', () => {
+    it('should log in a user and return a token', async () => {
+      const loginResult = {
+        user: { id: 1, username: 'testuser', email: 'test@example.com', fullname: 'Test User' },
+        token: 'mock.token',
+      };
+      req.body = { email: 'test@example.com', password: 'password123' };
+      mockedUserService.login.mockResolvedValue(loginResult);
+
+      await userController.login(req as Request, res as Response);
+
+      expect(mockedUserService.login).toHaveBeenCalledWith('test@example.com', 'password123');
+      expect(json).toHaveBeenCalledWith(loginResult);
+    });
+
+    it('should return 400 for invalid credentials', async () => {
+      req.body = { email: 'test@example.com', password: 'wrongpassword' };
+      const error = new Error('Invalid credentials');
+      mockedUserService.login.mockRejectedValue(error);
+
+      await userController.login(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid credentials' }));
+    });
+  });
+
+  // Test for getting a user profile
+  describe('getProfile', () => {
+    it('should return a user profile', async () => {
+      const user = { user_id: 1, username: 'testuser' };
+      req.params = { id: '1' };
+      mockedUserService.getProfile.mockResolvedValue(user as any);
+
+      await userController.getProfile(req as Request, res as Response);
+
+      expect(mockedUserService.getProfile).toHaveBeenCalledWith(1);
+      expect(json).toHaveBeenCalledWith(user);
+    });
+
+    it('should return 404 if user not found', async () => {
+      req.params = { id: '99' };
+      const error = new Error('User not found');
+      mockedUserService.getProfile.mockRejectedValue(error);
+
+      await userController.getProfile(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(404);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'User not found' }));
+    });
+  });
+
+  // Test for deleting a user
+  describe('deleteUser', () => {
+    it('should delete a user and return a success message', async () => {
+      req.params = { id: '1' };
+      mockedUserService.deleteUser.mockResolvedValue(true);
+
+      await userController.deleteUser(req as Request, res as Response);
+
+      expect(mockedUserService.deleteUser).toHaveBeenCalledWith(1);
+      expect(json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
+    });
+
+    it('should return 500 if user deletion fails', async () => {
+      req.params = { id: '1' };
+      const error = new Error('Failed to delete user');
+      mockedUserService.deleteUser.mockRejectedValue(error);
+
+      await userController.deleteUser(req as Request, res as Response);
+
+      expect(status).toHaveBeenCalledWith(500);
+      expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to delete user' }));
+    });
+  });
+});
+

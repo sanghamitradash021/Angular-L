@@ -1,6 +1,7 @@
 import recipeRepository from '../repositories/recipeRepository';
 import Recipe from '../models/recipe';
 import NodeCache from 'node-cache';
+import logger from '../config/logger';
 
 const recipeCache = new NodeCache({ stdTTL: 300 });
 
@@ -41,12 +42,12 @@ async getRecipeById(id: number): Promise<Recipe> {
 
     // 3. If the recipe is found in the cache, return it instantly.
     if (cachedRecipe) {
-        console.log(`CACHE HIT: Found recipe ${id} in cache.`);
+        logger.info(`CACHE HIT: Found recipe ${id} in cache.`);
         return cachedRecipe;
     }
 
     // 4. If not in the cache, fetch it from the database.
-    console.log(`CACHE MISS: Fetching recipe ${id} from database.`);
+    logger.info(`CACHE MISS: Fetching recipe ${id} from database.`);
     const recipe = await recipeRepository.findById(id); 
     if (!recipe) {
         throw new Error('Recipe not found'); 
@@ -103,7 +104,7 @@ async updateRecipe(id: number, recipeData: any): Promise<Recipe> {
 
     // --- CACHE INVALIDATION ---
     const cacheKey = `recipe_${id}`;
-    console.log(`INVALIDATE CACHE: Updating recipe ${id} in cache.`);
+    logger.info(`INVALIDATE CACHE: Updating recipe ${id} in cache.`);
     // Set the cache with the new, updated recipe data.
     // This overwrites the old entry if it exists.
     recipeCache.set(cacheKey, updatedRecipe);
@@ -140,7 +141,7 @@ async deleteRecipe(id: number): Promise<{ success: boolean; recipeId: number }> 
 
     // --- CACHE INVALIDATION ---
     const cacheKey = `recipe_${id}`;
-    console.log(`INVALIDATE CACHE: Deleting recipe ${id} from cache.`);
+    logger.info(`INVALIDATE CACHE: Deleting recipe ${id} from cache.`);
     // Delete the entry from the cache.
     recipeCache.del(cacheKey);
     // --- END CACHE INVALIDATION ---

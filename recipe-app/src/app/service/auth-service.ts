@@ -18,7 +18,7 @@ import { User, AuthResponse, DecodedToken } from '../models/interface/user.inter
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/users';
+  private apiUrl = 'users';
   
   currentUser = signal<User | null>(this.getInitialUser());
 

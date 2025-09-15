@@ -41,9 +41,9 @@ export class RecipeListComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       // Handle mealType parameter
       let mealTypeParam = params['mealType'] || null;
-      if (mealTypeParam && mealTypeParam.toLowerCase() === 'snacks') {
-        mealTypeParam = 'Snack';
-      }
+      // if (mealTypeParam && mealTypeParam.toLowerCase() === 'Snack') {
+      //   mealTypeParam = 'Snack';
+      // }
       this.mealType = mealTypeParam;
 
       // Handle cuisine parameter

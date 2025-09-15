@@ -1,13 +1,14 @@
 import { sequelize } from '../config/database';
 import { QueryTypes } from 'sequelize';
 import Recipe from '../models/recipe';
+import logger from '../config/logger';
 
 /* Define the Recipe interface to represent the structure of a recipe record */
 
 class RecipeRepository {
   async createRecipe(recipeData: any): Promise<number | null> {
     try {
-      console.log('Repository received data:', recipeData);
+      logger.log('Repository received data:', recipeData);
 
       const {
         title,
@@ -41,8 +42,8 @@ class RecipeRepository {
         image: image || null, // This is the key fix
       };
 
-      console.log('SQL Query:', query);
-      console.log('Replacements:', replacements);
+      logger.log('SQL Query:', query);
+      logger.log('Replacements:', replacements);
 
       await sequelize.query(query, {
         replacements,
@@ -52,10 +53,10 @@ class RecipeRepository {
       const idResult: any = await sequelize.query('SELECT LAST_INSERT_ID() as id', { type: QueryTypes.SELECT });
       const newId = idResult?.[0]?.id ?? null;
 
-      console.log('Created recipe with ID:', newId);
+      logger.log('Created recipe with ID:', newId);
       return newId;
     } catch (error) {
-      console.error('Error in createRecipe repository:', error);
+      logger.error('Error in createRecipe repository:', error);
       throw error;
     }
   }
@@ -130,7 +131,7 @@ class RecipeRepository {
   //         }
   //     );
 
-  //     console.log("Query result:", result); // Log the result for debugging
+  //     logger.log("Query result:", result); // Log the result for debugging
 
   //     const affectedRows = result && Array.isArray(result) && result[1] > 0 ? result[1] : 0; // Check if the affected rows is greater than 0
   //     return affectedRows > 0;
@@ -185,7 +186,7 @@ class RecipeRepository {
 
   async deleteRecipe(id: number): Promise<boolean> {
     try {
-      console.log('Repository: Deleting recipe with ID:', id);
+      logger.log('Repository: Deleting recipe with ID:', id);
 
       await sequelize.query('DELETE FROM Recipes WHERE recipe_id = :id', {
         replacements: { id },
@@ -196,7 +197,7 @@ class RecipeRepository {
       // The controller already checks if the recipe exists before calling this method
       return true;
     } catch (error) {
-      console.error('Repository error deleting recipe:', error);
+      logger.error('Repository error deleting recipe:', error);
       throw error;
     }
   }
